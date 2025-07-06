@@ -17,7 +17,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'profil.dart';
 
-// Service d'authentification
+// Authentication Service
 class AuthService {
   static const String _tokenKey = 'auth_token';
   static const String _userIdKey = 'user_id';
@@ -66,7 +66,7 @@ class AuthService {
   }
 }
 
-// Page principale avec navigation
+// Main Page with Navigation
 class MainPage extends StatefulWidget {
   const MainPage({Key? key}) : super(key: key);
 
@@ -80,15 +80,13 @@ class _MainPageState extends State<MainPage> {
   String? userName;
   String? userEmail;
 
-  // Liste des pages à afficher
+  // List of pages to display
   final List<Widget> _pages = [
     DashboardPage(),
     EditionTaches(),
     Services(),
     Statistic(),
-    //ProfileSettingsPageState()
     setting.ProfileSettingsPage(),
-    //SettingsApp(),
   ];
 
   @override
@@ -109,7 +107,7 @@ class _MainPageState extends State<MainPage> {
       appBar: AppBar(
         title: Text(_getAppBarTitle()),
         actions: [
-          if (_currentIndex == 0) // Afficher seulement sur le tableau de bord
+          if (_currentIndex == 0) // Only show on dashboard
             IconButton(
               icon: const Icon(Icons.logout),
               onPressed: _handleLogout,
@@ -146,23 +144,23 @@ class _MainPageState extends State<MainPage> {
           items: const [
             BottomNavigationBarItem(
               icon: Icon(Icons.dashboard),
-              label: 'Tableau de bord',
+              label: 'Dashboard',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.check_circle_outline),
-              label: 'Tâches',
+              label: 'Tasks',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.track_changes),
-              label: 'Objectifs',
+              label: 'Goals',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.bar_chart),
-              label: 'Statistiques',
+              label: 'Statistics',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.person_2_rounded),
-              label: 'Mon Profil',
+              label: 'My Profile',
             ),
           ],
         ),
@@ -173,15 +171,15 @@ class _MainPageState extends State<MainPage> {
   String _getAppBarTitle() {
     switch (_currentIndex) {
       case 0:
-        return 'Tableau de bord';
+        return 'Dashboard';
       case 1:
-        return 'Gestion des tâches';
+        return 'Task Management';
       case 2:
-        return 'Objectifs';
+        return 'Goals';
       case 3:
-        return 'Statistique';
+        return 'Statistics';
       case 4:
-        return 'Profil';
+        return 'Profile';
       default:
         return 'Student Study Planner';
     }
@@ -197,7 +195,7 @@ class _MainPageState extends State<MainPage> {
   }
 }
 
-// Modèle de tâche pour le tableau de bord
+// Task Model for Dashboard
 class DashboardTask {
   final String id;
   final String title;
@@ -216,7 +214,7 @@ class DashboardTask {
   factory DashboardTask.fromJson(Map<String, dynamic> json) {
     return DashboardTask(
       id: json['_id'] ?? json['id'] ?? '',
-      title: json['title']?.toString() ?? 'Sans titre',
+      title: json['title']?.toString() ?? 'Untitled',
       dateTime: DateTime.parse(json['date']),
       durationMinutes: json['duration'] ?? 0,
       status: json['status']?.toString() ?? 'pending',
@@ -224,7 +222,7 @@ class DashboardTask {
   }
 }
 
-// Page Dashboard mise à jour
+// Updated Dashboard Page
 class DashboardPage extends StatefulWidget {
   const DashboardPage({Key? key}) : super(key: key);
 
@@ -235,11 +233,10 @@ class DashboardPage extends StatefulWidget {
 class _DashboardPageState extends State<DashboardPage> {
   final AuthService _authService = AuthService();
   String? userName;
-  final double weeklyProgress = 0.75; // 75% de progression
+  final double weeklyProgress = 0.75; // 75% progress
   final int plannedHours = 40;
   final int completedHours = 30;
   StudyTask? nextTask;
-  // Variables pour la prochaine tâche
   DashboardTask? _nextTask;
   bool _isLoadingTasks = true;
   String? _errorMessage;
@@ -248,7 +245,6 @@ class _DashboardPageState extends State<DashboardPage> {
   void initState() {
     super.initState();
     _loadUserData();
-    // _loadNextTask();
   }
 
   Future<void> _loadUserData() async {
@@ -257,7 +253,6 @@ class _DashboardPageState extends State<DashboardPage> {
       userName = name;
     });
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -268,19 +263,15 @@ class _DashboardPageState extends State<DashboardPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Salutation
+            // Greeting
             _buildGreetingSection(),
             const SizedBox(height: 30),
 
-            // Progression hebdomadaire
+            // Weekly Progress
             _buildWeeklyProgressSection(),
             const SizedBox(height: 30),
 
-            // Prochaine tâche
-            // _buildNextTaskSection(),
-            const SizedBox(height: 30),
-
-            // Accès rapide
+            // Quick Access
             _buildQuickAccessSection(),
           ],
         ),
@@ -304,7 +295,7 @@ class _DashboardPageState extends State<DashboardPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Bonjour, ${userName ?? 'Étudiant'} 👋',
+            'Hello, ${userName ?? 'Student'} 👋',
             style: const TextStyle(
               fontSize: 28,
               fontWeight: FontWeight.bold,
@@ -313,7 +304,7 @@ class _DashboardPageState extends State<DashboardPage> {
           ),
           const SizedBox(height: 8),
           Text(
-            'Prêt à conquérir vos objectifs aujourd\'hui ?',
+            'Ready to conquer your goals today?',
             style: TextStyle(
               fontSize: 16,
               color: Colors.white.withOpacity(0.9),
@@ -348,7 +339,7 @@ class _DashboardPageState extends State<DashboardPage> {
               Icon(Icons.trending_up, color: Colors.green[600], size: 24),
               const SizedBox(width: 10),
               const Text(
-                'Progression hebdomadaire',
+                'Weekly Progress',
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.w600,
@@ -359,7 +350,7 @@ class _DashboardPageState extends State<DashboardPage> {
           const SizedBox(height: 20),
           Row(
             children: [
-              // Cercle de progression
+              // Progress circle
               Stack(
                 alignment: Alignment.center,
                 children: [
@@ -384,7 +375,7 @@ class _DashboardPageState extends State<DashboardPage> {
                 ],
               ),
               const SizedBox(width: 30),
-              // Détails de progression
+              // Progress details
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -399,7 +390,7 @@ class _DashboardPageState extends State<DashboardPage> {
                     ),
                     const SizedBox(height: 5),
                     Text(
-                      'Heures réalisées cette semaine',
+                      'Hours completed this week',
                       style: TextStyle(
                         fontSize: 14,
                         color: Colors.grey[600],
@@ -421,13 +412,12 @@ class _DashboardPageState extends State<DashboardPage> {
     );
   }
 
-
   Widget _buildQuickAccessSection() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
-          'Accès rapide',
+          'Quick Access',
           style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.w600,
@@ -444,25 +434,25 @@ class _DashboardPageState extends State<DashboardPage> {
           children: [
             _buildQuickAccessCard(
               icon: Icons.person_2_rounded,
-              title: 'Mon Profil',
+              title: 'My Profile',
               color: Colors.blue[600]!,
               onTap: () => _navigateToTab(4),
             ),
             _buildQuickAccessCard(
               icon: Icons.track_changes,
-              title: 'Mes objectifs',
+              title: 'My Goals',
               color: Colors.purple[600]!,
               onTap: () => _navigateToTab(2),
             ),
             _buildQuickAccessCard(
               icon: Icons.check_circle_outline,
-              title: 'Mes tâches',
+              title: 'My Tasks',
               color: Colors.green[600]!,
               onTap: () => _navigateToTab(1),
             ),
             _buildQuickAccessCard(
               icon: Icons.bar_chart,
-              title: 'Statistiques',
+              title: 'Statistics',
               color: Colors.orange[600]!,
               onTap: () => _navigateToTab(3),
             ),
@@ -525,7 +515,6 @@ class _DashboardPageState extends State<DashboardPage> {
   }
 
   void _navigateToTab(int index) {
-    // Accès au parent MainPage pour changer d'onglet
     final mainPageState = context.findAncestorStateOfType<_MainPageState>();
     if (mainPageState != null) {
       mainPageState.setState(() {
@@ -540,7 +529,7 @@ class _DashboardPageState extends State<DashboardPage> {
   }
 }
 
-// Application principale
+// Main Application
 class MyApp extends StatefulWidget {
   const MyApp({Key? key}) : super(key: key);
 

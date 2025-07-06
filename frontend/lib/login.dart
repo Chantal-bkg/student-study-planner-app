@@ -8,7 +8,6 @@ import 'main.dart';
 import 'register.dart';
 import 'profil.dart';
 
-
 class StudentLoginPage extends StatefulWidget {
   const StudentLoginPage({Key? key}) : super(key: key);
 
@@ -24,7 +23,7 @@ class _StudentLoginPageState extends State<StudentLoginPage> {
   bool _isLoading = false;
   final AuthService _authService = AuthService();
 
-  // Couleurs du thème
+  // Theme colors
   final Color _primaryColor = const Color(0xFF3498DB);
   final Color _accentColor = const Color(0xFF2ECC71);
   final Color _warningColor = const Color(0xFFF39C12);
@@ -50,15 +49,15 @@ class _StudentLoginPageState extends State<StudentLoginPage> {
     if (_formKey.currentState!.validate()) {
       setState(() => _isLoading = true);
 
-      // Vérifier la connexion Internet
+      // Check internet connection
       if (!await _checkNetworkConnection()) {
-        _showErrorDialog('Pas de connexion Internet. Veuillez vérifier votre réseau.');
+        _showErrorDialog('No internet connection. Please check your network.');
         setState(() => _isLoading = false);
         return;
       }
 
       try {
-        // Utilisez 10.0.2.2 pour les émulateurs Android, localhost pour iOS
+        // Use 10.0.2.2 for Android emulators, localhost for iOS
         final uri = Uri.parse('http://10.0.2.2:5002/api/auth/login');
 
         final response = await http.post(
@@ -73,15 +72,15 @@ class _StudentLoginPageState extends State<StudentLoginPage> {
         if (response.statusCode == 200) {
           final responseData = json.decode(response.body);
 
-          // Correction de l'accès au token
+          // Access token
           final userData = responseData['user'];
           final token = userData['token'];
 
           if (token == null) {
-            throw Exception('Token non trouvé dans la réponse');
+            throw Exception('Token not found in response');
           }
 
-          // Sauvegarder les données utilisateur
+          // Save user data
           await _authService.saveUserData({
             'token': token,
             'id': userData['id'],
@@ -95,16 +94,16 @@ class _StudentLoginPageState extends State<StudentLoginPage> {
           );
         } else {
           final errorData = json.decode(response.body);
-          _showErrorDialog(errorData['message'] ?? 'Échec de la connexion: ${response.statusCode}');
+          _showErrorDialog(errorData['message'] ?? 'Login failed: ${response.statusCode}');
         }
       } on SocketException {
-        _showErrorDialog('Erreur de connexion. Vérifiez votre réseau.');
+        _showErrorDialog('Connection error. Check your network.');
       } on TimeoutException {
-        _showErrorDialog('Le serveur a mis trop de temps à répondre.');
+        _showErrorDialog('Server took too long to respond.');
       } on http.ClientException catch (e) {
-        _showErrorDialog('Erreur client: ${e.message}');
+        _showErrorDialog('Client error: ${e.message}');
       } catch (e) {
-        _showErrorDialog('Erreur inattendue: $e');
+        _showErrorDialog('Unexpected error: $e');
       } finally {
         setState(() => _isLoading = false);
       }
@@ -115,7 +114,7 @@ class _StudentLoginPageState extends State<StudentLoginPage> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Erreur de connexion'),
+        title: const Text('Login Error'),
         content: Text(message),
         actions: [
           TextButton(
@@ -154,7 +153,7 @@ class _StudentLoginPageState extends State<StudentLoginPage> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    // Icône de graduation
+                    // Graduation icon
                     Container(
                       width: 120,
                       height: 120,
@@ -165,7 +164,7 @@ class _StudentLoginPageState extends State<StudentLoginPage> {
                       child: Stack(
                         alignment: Alignment.center,
                         children: [
-                          // Chapeau de graduation
+                          // Graduation cap
                           Container(
                             width: 80,
                             height: 60,
@@ -174,7 +173,7 @@ class _StudentLoginPageState extends State<StudentLoginPage> {
                             ),
                             child: Stack(
                               children: [
-                                // Partie principale du chapeau
+                                // Main cap part
                                 Positioned(
                                   top: 10,
                                   left: 10,
@@ -186,7 +185,7 @@ class _StudentLoginPageState extends State<StudentLoginPage> {
                                     ),
                                   ),
                                 ),
-                                // Gland du chapeau
+                                // Cap tassel
                                 Positioned(
                                   top: 0,
                                   right: 15,
@@ -211,7 +210,7 @@ class _StudentLoginPageState extends State<StudentLoginPage> {
                               ],
                             ),
                           ),
-                          // Diplôme
+                          // Diploma
                           Positioned(
                             bottom: 10,
                             left: 20,
@@ -257,9 +256,9 @@ class _StudentLoginPageState extends State<StudentLoginPage> {
                     ),
                     const SizedBox(height: 30),
 
-                    // Titre
+                    // Title
                     Text(
-                      'Connexion Étudiant',
+                      'Student Login',
                       style: TextStyle(
                         fontSize: 26,
                         fontWeight: FontWeight.bold,
@@ -268,21 +267,21 @@ class _StudentLoginPageState extends State<StudentLoginPage> {
                     ),
                     const SizedBox(height: 40),
 
-                    // Champ Email
+                    // Email field
                     TextFormField(
                       controller: _emailController,
                       keyboardType: TextInputType.emailAddress,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Veuillez entrer votre email';
+                          return 'Please enter your email';
                         }
                         if (!RegExp(r'^[\w-\.]+@(etu\.[\w-]+\.\w+|[\w-]+\.\w+)$').hasMatch(value)) {
-                          return 'Veuillez entrer un email étudiant valide';
+                          return 'Please enter a valid student email';
                         }
                         return null;
                       },
                       decoration: InputDecoration(
-                        hintText: 'Email étudiant',
+                        hintText: 'Student email',
                         hintStyle: TextStyle(
                           color: Colors.grey.shade500,
                           fontSize: 16,
@@ -305,18 +304,18 @@ class _StudentLoginPageState extends State<StudentLoginPage> {
                     ),
                     const SizedBox(height: 20),
 
-                    // Champ Mot de passe
+                    // Password field
                     TextFormField(
                       controller: _passwordController,
                       obscureText: !_isPasswordVisible,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Veuillez entrer votre mot de passe';
+                          return 'Please enter your password';
                         }
                         return null;
                       },
                       decoration: InputDecoration(
-                        hintText: 'Mot de passe',
+                        hintText: 'Password',
                         hintStyle: TextStyle(
                           color: Colors.grey.shade500,
                           fontSize: 16,
@@ -352,7 +351,7 @@ class _StudentLoginPageState extends State<StudentLoginPage> {
                     ),
                     const SizedBox(height: 30),
 
-                    // Bouton de connexion
+                    // Login button
                     SizedBox(
                       width: double.infinity,
                       height: 55,
@@ -376,7 +375,7 @@ class _StudentLoginPageState extends State<StudentLoginPage> {
                           ),
                         )
                             : const Text(
-                          'Se connecter',
+                          'Login',
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
@@ -386,7 +385,7 @@ class _StudentLoginPageState extends State<StudentLoginPage> {
                     ),
                     const SizedBox(height: 20),
 
-                    // Bouton d'inscription
+                    // Register button
                     SizedBox(
                       width: double.infinity,
                       height: 55,
@@ -408,7 +407,7 @@ class _StudentLoginPageState extends State<StudentLoginPage> {
                           ),
                         ),
                         child: const Text(
-                          'Créer un compte',
+                          'Create Account',
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
@@ -417,11 +416,11 @@ class _StudentLoginPageState extends State<StudentLoginPage> {
                       ),
                     ),
 
-                    // Lien mot de passe oublié
+                    // Forgot password link
                     TextButton(
                       onPressed: _isLoading ? null : () => _showPasswordResetDialog(),
                       child: Text(
-                        'Mot de passe oublié ?',
+                        'Forgot Password?',
                         style: TextStyle(
                           color: _warningColor,
                           fontSize: 16,
@@ -445,12 +444,12 @@ class _StudentLoginPageState extends State<StudentLoginPage> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Réinitialisation du mot de passe'),
+        title: const Text('Password Reset'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              'Entrez votre email pour recevoir un lien de réinitialisation',
+              'Enter your email to receive a reset link',
               style: TextStyle(color: Colors.grey.shade700),
             ),
             const SizedBox(height: 20),
@@ -458,7 +457,7 @@ class _StudentLoginPageState extends State<StudentLoginPage> {
               controller: emailController,
               keyboardType: TextInputType.emailAddress,
               decoration: InputDecoration(
-                labelText: 'Email étudiant',
+                labelText: 'Student email',
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
@@ -470,7 +469,7 @@ class _StudentLoginPageState extends State<StudentLoginPage> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('Annuler'),
+            child: const Text('Cancel'),
           ),
           ElevatedButton(
             onPressed: () async {
@@ -485,7 +484,7 @@ class _StudentLoginPageState extends State<StudentLoginPage> {
                 if (response.statusCode == 200) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
-                      content: Text('Email de réinitialisation envoyé !'),
+                      content: Text('Reset email sent!'),
                       backgroundColor: Colors.green,
                     ),
                   );
@@ -494,7 +493,7 @@ class _StudentLoginPageState extends State<StudentLoginPage> {
                   final errorData = json.decode(response.body);
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text(errorData['message'] ?? 'Erreur inconnue'),
+                      content: Text(errorData['message'] ?? 'Unknown error'),
                       backgroundColor: Colors.red,
                     ),
                   );
@@ -502,14 +501,14 @@ class _StudentLoginPageState extends State<StudentLoginPage> {
               } on TimeoutException {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
-                    content: Text('Le serveur a mis trop de temps à répondre'),
+                    content: Text('Server took too long to respond'),
                     backgroundColor: Colors.red,
                   ),
                 );
               } catch (e) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text('Erreur: $e'),
+                    content: Text('Error: $e'),
                     backgroundColor: Colors.red,
                   ),
                 );
@@ -519,7 +518,7 @@ class _StudentLoginPageState extends State<StudentLoginPage> {
               backgroundColor: _accentColor,
               foregroundColor: Colors.white,
             ),
-            child: const Text('Envoyer'),
+            child: const Text('Send'),
           ),
         ],
       ),

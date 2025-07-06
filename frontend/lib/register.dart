@@ -24,7 +24,7 @@ class _RegisterState extends State<Register> {
   bool _isLoading = false;
   bool _isHovering = false;
 
-  // Couleurs du thème
+  // Theme colors
   final Color _primaryColor = const Color(0xFF3498DB);
   final Color _accentColor = const Color(0xFF2ECC71);
   final Color _warningColor = const Color(0xFFF39C12);
@@ -45,7 +45,7 @@ class _RegisterState extends State<Register> {
 
       try {
         final uri = Uri.parse('http://10.0.2.2:5002/api/auth/register');
-        print("Envoi à: $uri");
+        print("Sending to: $uri");
 
         final response = await http.post(
           uri,
@@ -58,20 +58,20 @@ class _RegisterState extends State<Register> {
         ).timeout(const Duration(seconds: 10));
 
         if (response.statusCode == 201) {
-          // Succès...
+          // Success...
         } else if (response.statusCode == 400) {
-          _showErrorDialog('Email déjà utilisé');
+          _showErrorDialog('Email already in use');
         } else {
-          _showErrorDialog('Erreur serveur: ${response.statusCode}');
+          _showErrorDialog('Server error: ${response.statusCode}');
         }
       } on SocketException {
-        _showErrorDialog('Pas de connexion internet');
+        _showErrorDialog('No internet connection');
       } on TimeoutException {
-        _showErrorDialog('Temps d\'attente dépassé');
+        _showErrorDialog('Connection timed out');
       } on http.ClientException catch (e) {
-        _showErrorDialog('Erreur client: ${e.message}');
+        _showErrorDialog('Client error: ${e.message}');
       } catch (e) {
-        _showErrorDialog('Erreur inattendue: $e');
+        _showErrorDialog('Unexpected error: $e');
       } finally {
         if (mounted) setState(() => _isLoading = false);
       }
@@ -82,7 +82,7 @@ class _RegisterState extends State<Register> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Erreur d\'inscription'),
+        title: const Text('Registration Error'),
         content: Text(message),
         actions: [
           TextButton(
@@ -96,46 +96,46 @@ class _RegisterState extends State<Register> {
 
   String? _validateFullName(String? value) {
     if (value == null || value.isEmpty) {
-      return 'Veuillez entrer votre nom complet';
+      return 'Please enter your full name';
     }
     if (value.trim().split(' ').length < 2) {
-      return 'Veuillez entrer votre prénom et nom';
+      return 'Please enter first and last name';
     }
     if (value.length < 3) {
-      return 'Le nom doit contenir au moins 3 caractères';
+      return 'Name must be at least 3 characters';
     }
     return null;
   }
 
   String? _validateEmail(String? value) {
     if (value == null || value.isEmpty) {
-      return 'Veuillez entrer votre email';
+      return 'Please enter your email';
     }
     if (!RegExp(r'^[\w-\.]+@(etu\.[\w-]+\.\w+|[\w-]+\.\w+)$').hasMatch(value)) {
-      return 'Veuillez entrer un email étudiant valide';
+      return 'Please enter a valid student email';
     }
     return null;
   }
 
   String? _validatePassword(String? value) {
     if (value == null || value.isEmpty) {
-      return 'Veuillez entrer un mot de passe';
+      return 'Please enter a password';
     }
     if (value.length < 8) {
-      return 'Le mot de passe doit contenir au moins 8 caractères';
+      return 'Password must be at least 8 characters';
     }
     if (!RegExp(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)').hasMatch(value)) {
-      return 'Doit contenir majuscule, minuscule et chiffre';
+      return 'Must contain uppercase, lowercase and number';
     }
     return null;
   }
 
   String? _validateConfirmPassword(String? value) {
     if (value == null || value.isEmpty) {
-      return 'Veuillez confirmer votre mot de passe';
+      return 'Please confirm your password';
     }
     if (value != _passwordController.text) {
-      return 'Les mots de passe ne correspondent pas';
+      return 'Passwords do not match';
     }
     return null;
   }
@@ -167,13 +167,13 @@ class _RegisterState extends State<Register> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    // Animation de livre
+                    // Book animation
                     _buildBookAnimation(),
                     const SizedBox(height: 30),
 
-                    // Titre
+                    // Title
                     Text(
-                      'Créer un Compte Étudiant',
+                      'Create Student Account',
                       style: TextStyle(
                         fontSize: 26,
                         fontWeight: FontWeight.bold,
@@ -184,7 +184,7 @@ class _RegisterState extends State<Register> {
                     ),
                     const SizedBox(height: 10),
                     Text(
-                      'Rejoignez notre communauté académique',
+                      'Join our academic community',
                       style: TextStyle(
                         fontSize: 16,
                         color: Colors.grey.shade600,
@@ -193,58 +193,58 @@ class _RegisterState extends State<Register> {
                     ),
                     const SizedBox(height: 40),
 
-                    // Champ Nom complet
+                    // Full Name field
                     _buildInputField(
                       controller: _fullNameController,
-                      hint: 'Nom complet',
+                      hint: 'Full name',
                       icon: Icons.person_outline,
                       validator: _validateFullName,
                     ),
                     const SizedBox(height: 20),
 
-                    // Champ Email
+                    // Email field
                     _buildInputField(
                       controller: _emailController,
-                      hint: 'Email étudiant',
+                      hint: 'Student email',
                       icon: Icons.email_outlined,
                       keyboardType: TextInputType.emailAddress,
                       validator: _validateEmail,
                     ),
                     const SizedBox(height: 20),
 
-                    // Champ Mot de passe
+                    // Password field
                     _buildPasswordField(
                       controller: _passwordController,
-                      hint: 'Mot de passe',
+                      hint: 'Password',
                       isVisible: _isPasswordVisible,
                       onToggle: () => setState(() => _isPasswordVisible = !_isPasswordVisible),
                       validator: _validatePassword,
                     ),
                     const SizedBox(height: 20),
 
-                    // Champ Confirmer mot de passe
+                    // Confirm Password field
                     _buildPasswordField(
                       controller: _confirmPasswordController,
-                      hint: 'Confirmer mot de passe',
+                      hint: 'Confirm password',
                       isVisible: _isConfirmPasswordVisible,
                       onToggle: () => setState(() => _isConfirmPasswordVisible = !_isConfirmPasswordVisible),
                       validator: _validateConfirmPassword,
                     ),
                     const SizedBox(height: 30),
 
-                    // Indicateur de force du mot de passe
+                    // Password strength indicator
                     _buildPasswordStrengthIndicator(),
                     const SizedBox(height: 20),
 
-                    // Bouton de création de compte
+                    // Signup button
                     _buildSignupButton(),
                     const SizedBox(height: 30),
 
-                    // Ligne de séparation
+                    // Divider
                     _buildDivider(),
                     const SizedBox(height: 20),
 
-                    // Lien vers la page de connexion
+                    // Login link
                     _buildLoginLink(),
                   ],
                 ),
@@ -270,7 +270,7 @@ class _RegisterState extends State<Register> {
       child: Stack(
         alignment: Alignment.center,
         children: [
-          // Livre ouvert
+          // Open book
           AnimatedContainer(
             duration: const Duration(milliseconds: 500),
             curve: Curves.easeInOut,
@@ -289,7 +289,7 @@ class _RegisterState extends State<Register> {
             ),
             child: Stack(
               children: [
-                // Pages du livre
+                // Book pages
                 Positioned(
                   left: 37,
                   top: 5,
@@ -299,7 +299,7 @@ class _RegisterState extends State<Register> {
                     color: Colors.white.withOpacity(0.7),
                   ),
                 ),
-                // Lignes de texte à gauche
+                // Text lines left
                 ...List.generate(5, (index) => Positioned(
                   left: 10,
                   top: 10 + (index * 8.0),
@@ -309,7 +309,7 @@ class _RegisterState extends State<Register> {
                     color: Colors.white.withOpacity(0.8),
                   ),
                 )),
-                // Lignes de texte à droite
+                // Text lines right
                 ...List.generate(5, (index) => Positioned(
                   right: 10,
                   top: 10 + (index * 8.0),
@@ -323,7 +323,7 @@ class _RegisterState extends State<Register> {
             ),
           ),
 
-          // Chapeau de graduation
+          // Graduation cap
           Positioned(
             top: 8,
             right: 12,
@@ -365,7 +365,7 @@ class _RegisterState extends State<Register> {
             ),
           ),
 
-          // Étoile de nouveau compte
+          // New account star
           Positioned(
             bottom: 12,
             left: 12,
@@ -480,7 +480,7 @@ class _RegisterState extends State<Register> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Force du mot de passe:',
+          'Password strength:',
           style: TextStyle(
             color: _darkColor,
             fontWeight: FontWeight.w500,
@@ -507,10 +507,10 @@ class _RegisterState extends State<Register> {
               _passwordController.text.isEmpty
                   ? ''
                   : _passwordController.text.length > 10
-                  ? 'Fort'
+                  ? 'Strong'
                   : _passwordController.text.length > 6
-                  ? 'Moyen'
-                  : 'Faible',
+                  ? 'Medium'
+                  : 'Weak',
               style: TextStyle(
                 color: _passwordController.text.isEmpty
                     ? Colors.grey
@@ -526,7 +526,7 @@ class _RegisterState extends State<Register> {
         ),
         const SizedBox(height: 5),
         Text(
-          '• 8 caractères minimum\n• 1 majuscule et 1 minuscule\n• 1 chiffre',
+          '• Minimum 8 characters\n• Uppercase and lowercase\n• At least 1 number',
           style: TextStyle(
             color: Colors.grey.shade600,
             fontSize: 12,
@@ -584,7 +584,7 @@ class _RegisterState extends State<Register> {
             ),
           )
               : Text(
-            'Créer mon compte',
+            'Create Account',
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w600,
@@ -609,7 +609,7 @@ class _RegisterState extends State<Register> {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Text(
-            'Déjà membre ?',
+            'Already a member?',
             style: TextStyle(
               color: Colors.grey.shade600,
               fontSize: 14,
@@ -642,14 +642,14 @@ class _RegisterState extends State<Register> {
       ),
       child: Text.rich(
         TextSpan(
-          text: 'Connectez-vous ',
+          text: 'Sign in ',
           style: TextStyle(
             color: _darkColor,
             fontSize: 16,
           ),
           children: [
             TextSpan(
-              text: 'ici',
+              text: 'here',
               style: TextStyle(
                 color: _primaryColor,
                 fontWeight: FontWeight.bold,

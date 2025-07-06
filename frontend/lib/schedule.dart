@@ -66,24 +66,24 @@ class _CalendarScreenState extends State<CalendarScreen>
     final now = DateTime.now();
     final colors = [
       Color(0xFFFFB347), // Orange
-      Color(0xFF4CAF50), // Vert
-      Color(0xFF2196F3), // Bleu
-      Color(0xFF9C27B0), // Violet
-      Color(0xFFE74C3C), // Rouge
+      Color(0xFF4CAF50), // Green
+      Color(0xFF2196F3), // Blue
+      Color(0xFF9C27B0), // Purple
+      Color(0xFFE74C3C), // Red
       Color(0xFF00BCD4), // Cyan
     ];
 
     tasks = [
-      // Aujourd'hui
+      // Today
       Task(
         id: '1',
-        title: 'Mathématiques - Algèbre',
+        title: 'Mathematics - Algebra',
         startTime: DateTime(now.year, now.month, now.day, 9, 0),
         duration: Duration(hours: 2),
-        subject: 'Mathématiques',
+        subject: 'Mathematics',
         color: colors[0],
         isCompleted: true,
-        description: 'Révision des équations du second degré',
+        description: 'Review of quadratic equations',
       ),
       Task(
         id: '2',
@@ -92,19 +92,19 @@ class _CalendarScreenState extends State<CalendarScreen>
         duration: Duration(hours: 1, minutes: 30),
         subject: 'Web',
         color: colors[1],
-        description: 'Les annimations',
+        description: 'Animations',
       ),
       Task(
         id: '3',
-        title: 'Anglais - Grammaire',
+        title: 'English - Grammar',
         startTime: DateTime(now.year, now.month, now.day, 16, 30),
         duration: Duration(minutes: 45),
-        subject: 'Anglais',
+        subject: 'English',
         color: colors[2],
-        description: 'Présent perfect et past simple',
+        description: 'Present perfect and past simple',
       ),
 
-      // Demain
+      // Tomorrow
       Task(
         id: '4',
         title: 'Marketing',
@@ -112,7 +112,7 @@ class _CalendarScreenState extends State<CalendarScreen>
         duration: Duration(hours: 1),
         subject: 'Business',
         color: colors[3],
-        description: 'Comment creer son entreprise',
+        description: 'How to start a business',
       ),
       Task(
         id: '5',
@@ -121,18 +121,18 @@ class _CalendarScreenState extends State<CalendarScreen>
         duration: Duration(hours: 2),
         subject: 'Dart',
         color: colors[4],
-        description: 'Develloppement mobile',
+        description: 'Mobile development',
       ),
 
-      // Autres jours de la semaine
+      // Other days in the week
       Task(
         id: '6',
-        title: 'Littérature française',
+        title: 'French Literature',
         startTime: DateTime(now.year, now.month, now.day + 2, 11, 0),
         duration: Duration(hours: 1, minutes: 30),
-        subject: 'Français',
+        subject: 'French',
         color: colors[5],
-        description: 'Analyse de "Le Petit Prince"',
+        description: 'Analysis of "The Little Prince"',
       ),
     ];
   }
@@ -145,7 +145,7 @@ class _CalendarScreenState extends State<CalendarScreen>
         backgroundColor: Colors.white,
         elevation: 0,
         title: Text(
-          'Mon Calendrier',
+          'My Calendar',
           style: TextStyle(
             color: Color(0xFF2C2C2C),
             fontWeight: FontWeight.bold,
@@ -165,8 +165,8 @@ class _CalendarScreenState extends State<CalendarScreen>
           unselectedLabelColor: Color(0xFF666666),
           labelStyle: TextStyle(fontWeight: FontWeight.bold),
           tabs: [
-            Tab(text: 'Vue hebdomadaire'),
-            Tab(text: 'Vue quotidienne'),
+            Tab(text: 'Week View'),
+            Tab(text: 'Day View'),
           ],
         ),
       ),
@@ -199,7 +199,7 @@ class _CalendarScreenState extends State<CalendarScreen>
   Widget _buildWeekNavigator() {
     final weekStart = _getWeekStart(selectedDate);
     final weekDays = List.generate(7, (index) => weekStart.add(Duration(days: index)));
-    final dayNames = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
+    final dayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
     return Container(
       margin: EdgeInsets.all(16),
@@ -303,7 +303,7 @@ class _CalendarScreenState extends State<CalendarScreen>
     weekTasks.sort((a, b) => a.startTime.compareTo(b.startTime));
 
     if (weekTasks.isEmpty) {
-      return _buildEmptyState('Aucune tâche cette semaine');
+      return _buildEmptyState('No tasks this week');
     }
 
     return ListView.builder(
@@ -389,7 +389,7 @@ class _CalendarScreenState extends State<CalendarScreen>
     final dayTasks = _getTasksForDay(selectedDate);
 
     if (dayTasks.isEmpty) {
-      return _buildEmptyState('Aucune tâche aujourd\'hui');
+      return _buildEmptyState('No tasks today');
     }
 
     return ListView.builder(
@@ -399,8 +399,8 @@ class _CalendarScreenState extends State<CalendarScreen>
         final task = dayTasks[index];
         return Dismissible(
           key: Key(task.id),
-          background: _buildSwipeBackground(Colors.green, Icons.check, 'Terminé'),
-          secondaryBackground: _buildSwipeBackground(Colors.red, Icons.delete, 'Supprimer'),
+          background: _buildSwipeBackground(Colors.green, Icons.check, 'Completed'),
+          secondaryBackground: _buildSwipeBackground(Colors.red, Icons.delete, 'Delete'),
           onDismissed: (direction) {
             if (direction == DismissDirection.startToEnd) {
               _markTaskCompleted(task);
@@ -485,7 +485,7 @@ class _CalendarScreenState extends State<CalendarScreen>
         padding: EdgeInsets.all(16),
         child: Row(
           children: [
-            // Indicateur de couleur
+            // Color indicator
             Container(
               width: 4,
               height: 60,
@@ -496,7 +496,7 @@ class _CalendarScreenState extends State<CalendarScreen>
             ),
             SizedBox(width: 16),
 
-            // Contenu principal
+            // Main content
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -583,7 +583,7 @@ class _CalendarScreenState extends State<CalendarScreen>
               ),
             ),
 
-            // Durée
+            // Duration
             Container(
               padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               decoration: BoxDecoration(
@@ -625,7 +625,7 @@ class _CalendarScreenState extends State<CalendarScreen>
           ),
           SizedBox(height: 8),
           Text(
-            'Appuyez sur + pour ajouter une tâche',
+            'Press + to add a task',
             style: TextStyle(
               fontSize: 14,
               color: Color(0xFF999999),
@@ -651,18 +651,18 @@ class _CalendarScreenState extends State<CalendarScreen>
     DateTime taskDate = selectedDate;
     TimeOfDay taskTime = TimeOfDay.now();
     Duration taskDuration = Duration(hours: 1);
-    String selectedSubject = 'Mathématiques';
+    String selectedSubject = 'Mathematics';
     Color selectedColor = Color(0xFFFFB347);
 
     final subjects = [
-      'Mathématiques',
-      'Physique',
-      'Chimie',
-      'Anglais',
-      'Français',
-      'Histoire',
-      'Géographie',
-      'SVT',
+      'Mathematics',
+      'Physics',
+      'Chemistry',
+      'English',
+      'French',
+      'History',
+      'Geography',
+      'Biology',
     ];
 
     final colors = [
@@ -694,7 +694,7 @@ class _CalendarScreenState extends State<CalendarScreen>
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'Nouvelle tâche',
+                      'New Task',
                       style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
@@ -712,7 +712,7 @@ class _CalendarScreenState extends State<CalendarScreen>
                 TextField(
                   controller: titleController,
                   decoration: InputDecoration(
-                    labelText: 'Titre de la tâche',
+                    labelText: 'Task Title',
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
@@ -723,7 +723,7 @@ class _CalendarScreenState extends State<CalendarScreen>
                 TextField(
                   controller: descriptionController,
                   decoration: InputDecoration(
-                    labelText: 'Description (optionnel)',
+                    labelText: 'Description (optional)',
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
@@ -735,7 +735,7 @@ class _CalendarScreenState extends State<CalendarScreen>
                 DropdownButtonFormField<String>(
                   value: selectedSubject,
                   decoration: InputDecoration(
-                    labelText: 'Matière',
+                    labelText: 'Subject',
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
@@ -778,7 +778,7 @@ class _CalendarScreenState extends State<CalendarScreen>
                     ),
                     Expanded(
                       child: ListTile(
-                        title: Text('Heure'),
+                        title: Text('Time'),
                         subtitle: Text(taskTime.format(context)),
                         leading: Icon(Icons.access_time),
                         onTap: () async {
@@ -824,7 +824,7 @@ class _CalendarScreenState extends State<CalendarScreen>
                       ),
                     ),
                     child: Text(
-                      'Ajouter la tâche',
+                      'Add Task',
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
@@ -841,7 +841,7 @@ class _CalendarScreenState extends State<CalendarScreen>
     );
   }
 
-  // Méthodes utilitaires
+  // Utility methods
   DateTime _getWeekStart(DateTime date) {
     final weekday = date.weekday;
     return date.subtract(Duration(days: weekday - 1));
@@ -862,8 +862,8 @@ class _CalendarScreenState extends State<CalendarScreen>
 
   String _formatDate(DateTime date) {
     final months = [
-      'Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jun',
-      'Jul', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc'
+      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
     ];
     return '${date.day} ${months[date.month - 1]} ${date.year}';
   }
@@ -874,7 +874,7 @@ class _CalendarScreenState extends State<CalendarScreen>
 
   String _formatDayName(DateTime date) {
     final days = [
-      'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'
+      'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'
     ];
     return days[date.weekday - 1];
   }
@@ -907,7 +907,7 @@ class _CalendarScreenState extends State<CalendarScreen>
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('Tâche "$title" ajoutée avec succès'),
+        content: Text('Task "$title" added successfully'),
         backgroundColor: Color(0xFFFFB347),
       ),
     );
@@ -920,7 +920,7 @@ class _CalendarScreenState extends State<CalendarScreen>
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('Tâche "${task.title}" marquée comme terminée'),
+        content: Text('Task "${task.title}" marked as completed'),
         backgroundColor: Colors.green,
       ),
     );
@@ -933,10 +933,10 @@ class _CalendarScreenState extends State<CalendarScreen>
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('Tâche "${task.title}" supprimée'),
+        content: Text('Task "${task.title}" deleted'),
         backgroundColor: Colors.red,
         action: SnackBarAction(
-          label: 'Annuler',
+          label: 'Undo',
           textColor: Colors.white,
           onPressed: () {
             setState(() {

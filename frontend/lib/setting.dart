@@ -16,7 +16,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
   String _userEmail = "";
   String _userAvatar = "";
   String _authToken = "";
-  String _accountType = "Compte Étudiant";
+  String _accountType = "Student Account";
   bool _isLoading = true;
   String? _errorMessage;
 
@@ -69,33 +69,33 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
         headers: {'Authorization': 'Bearer $token'},
       );
 
-      debugPrint('Réponse API: ${response.statusCode}');
-      debugPrint('Corps de la réponse: ${response.body}');
+      debugPrint('API Response: ${response.statusCode}');
+      debugPrint('Response Body: ${response.body}');
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> userData = json.decode(response.body);
         setState(() {
-          _userName = userData['name']?.toString() ?? 'Non défini';
-          _userEmail = userData['email']?.toString() ?? 'Non défini';
+          _userName = userData['name']?.toString() ?? 'Not defined';
+          _userEmail = userData['email']?.toString() ?? 'Not defined';
           _userAvatar = _getInitials(_userName);
           _nameController.text = _userName;
           _emailController.text = _userEmail;
           _isLoading = false;
         });
       } else if (response.statusCode == 401) {
-        _showSnackBar('Session expirée. Veuillez vous reconnecter.');
+        _showSnackBar('Session expired. Please log in again.');
         _redirectToLogin();
       } else {
         setState(() {
           _isLoading = false;
-          _errorMessage = 'Erreur de chargement: ${response.statusCode}';
+          _errorMessage = 'Loading error: ${response.statusCode}';
         });
       }
     } catch (e) {
-      debugPrint('Erreur: $e');
+      debugPrint('Error: $e');
       setState(() {
         _isLoading = false;
-        _errorMessage = 'Erreur de connexion: $e';
+        _errorMessage = 'Connection error: $e';
       });
     }
   }
@@ -121,7 +121,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
 
   Future<void> _updateUserProfile() async {
     if (_nameController.text.isEmpty || _emailController.text.isEmpty) {
-      _showSnackBar('Veuillez remplir tous les champs');
+      _showSnackBar('Please fill all fields');
       return;
     }
 
@@ -154,16 +154,16 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
           _userAvatar = _getInitials(_userName);
           _isEditingProfile = false;
         });
-        _showSnackBar('Profil mis à jour avec succès');
+        _showSnackBar('Profile updated successfully');
       } else {
         final errorBody = json.decode(response.body);
-        _showSnackBar('Échec de la mise à jour: ${errorBody['message']}');
+        _showSnackBar('Update failed: ${errorBody['message']}');
       }
     } catch (e) {
       setState(() {
         _isLoading = false;
       });
-      _showSnackBar('Erreur de connexion: $e');
+      _showSnackBar('Connection error: $e');
     }
   }
 
@@ -172,12 +172,12 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
     final confirmPassword = _confirmPasswordController.text;
 
     if (newPassword != confirmPassword) {
-      _showSnackBar('Les mots de passe ne correspondent pas');
+      _showSnackBar('Passwords do not match');
       return;
     }
 
     if (newPassword.length < 6) {
-      _showSnackBar('Le mot de passe doit contenir au moins 6 caractères');
+      _showSnackBar('Password must be at least 6 characters');
       return;
     }
 
@@ -203,7 +203,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
       });
 
       if (response.statusCode == 200) {
-        _showSnackBar('Mot de passe modifié avec succès');
+        _showSnackBar('Password changed successfully');
         _currentPasswordController.clear();
         _newPasswordController.clear();
         _confirmPasswordController.clear();
@@ -215,13 +215,13 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
         });
       } else {
         final errorBody = json.decode(response.body);
-        _showSnackBar('Échec de la modification: ${errorBody['message']}');
+        _showSnackBar('Change failed: ${errorBody['message']}');
       }
     } catch (e) {
       setState(() {
         _isLoading = false;
       });
-      _showSnackBar('Erreur de connexion: $e');
+      _showSnackBar('Connection error: $e');
     }
   }
 
@@ -246,13 +246,13 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
         Navigator.pushReplacementNamed(context, '/login');
       } else {
         final errorBody = json.decode(response.body);
-        _showSnackBar('Échec de la suppression: ${errorBody['message']}');
+        _showSnackBar('Deletion failed: ${errorBody['message']}');
       }
     } catch (e) {
       setState(() {
         _isLoading = false;
       });
-      _showSnackBar('Erreur de connexion: $e');
+      _showSnackBar('Connection error: $e');
     }
   }
 
@@ -266,7 +266,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
             children: [
               CircularProgressIndicator(),
               SizedBox(height: 20),
-              Text('Chargement de votre profil...'),
+              Text('Loading your profile...'),
             ],
           ),
         ),
@@ -279,13 +279,13 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text('Erreur', style: TextStyle(fontSize: 24, color: Colors.red)),
+              Text('Error', style: TextStyle(fontSize: 24, color: Colors.red)),
               SizedBox(height: 20),
               Text(_errorMessage!),
               SizedBox(height: 20),
               ElevatedButton(
                 onPressed: _loadUserData,
-                child: Text('Réessayer'),
+                child: Text('Try again'),
               ),
             ],
           ),
@@ -300,7 +300,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
           icon: Icon(Icons.arrow_back),
           onPressed: () => Navigator.of(context).pop(),
         ),
-        title: Text('Paramètres & Profil'),
+        title: Text('Settings & Profile'),
         backgroundColor: Colors.blue,
         elevation: 0,
         actions: [
@@ -308,7 +308,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
             TextButton(
               onPressed: _cancelEditing,
               child: Text(
-                'Annuler',
+                'Cancel',
                 style: TextStyle(color: Colors.white),
               ),
             ),
@@ -344,11 +344,11 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
-      BoxShadow(
-      color: Colors.grey.shade200,
-        blurRadius: 8,
-        offset: Offset(0, 2),
-      )],
+          BoxShadow(
+            color: Colors.grey.shade200,
+            blurRadius: 8,
+            offset: Offset(0, 2),
+          )],
       ),
       child: Row(
         children: [
@@ -420,11 +420,11 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
-      BoxShadow(
-      color: Colors.grey.shade200,
-        blurRadius: 8,
-        offset: Offset(0, 2),
-      )],
+          BoxShadow(
+            color: Colors.grey.shade200,
+            blurRadius: 8,
+            offset: Offset(0, 2),
+          )],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -433,7 +433,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Informations personnelles',
+                'Personal Information',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -443,7 +443,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
               if (_isEditingProfile)
                 ElevatedButton(
                   onPressed: _updateUserProfile,
-                  child: Text('Sauvegarder'),
+                  child: Text('Save'),
                 ),
             ],
           ),
@@ -452,7 +452,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
             controller: _nameController,
             enabled: _isEditingProfile,
             decoration: InputDecoration(
-              labelText: 'Nom complet',
+              labelText: 'Full name',
               prefixIcon: Icon(Icons.person),
               border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
             ),
@@ -463,7 +463,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
             enabled: _isEditingProfile,
             keyboardType: TextInputType.emailAddress,
             decoration: InputDecoration(
-              labelText: 'Adresse email',
+              labelText: 'Email address',
               prefixIcon: Icon(Icons.email),
               border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
             ),
@@ -494,7 +494,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Sécurité',
+                'Security',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -504,7 +504,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
               if (_isChangingPassword)
                 ElevatedButton(
                   onPressed: _changePassword,
-                  child: Text('Confirmer'),
+                  child: Text('Confirm'),
                 ),
             ],
           ),
@@ -512,7 +512,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
           if (!_isChangingPassword) ...[
             ListTile(
               leading: Icon(Icons.lock, color: Colors.orange),
-              title: Text('Modifier le mot de passe'),
+              title: Text('Change password'),
               trailing: Icon(Icons.arrow_forward_ios, size: 16),
               onTap: () => setState(() => _isChangingPassword = true),
             ),
@@ -521,7 +521,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
               controller: _currentPasswordController,
               obscureText: _obscureCurrentPassword,
               decoration: InputDecoration(
-                labelText: 'Mot de passe actuel',
+                labelText: 'Current password',
                 prefixIcon: Icon(Icons.lock),
                 suffixIcon: IconButton(
                   icon: Icon(_obscureCurrentPassword
@@ -537,7 +537,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
               controller: _newPasswordController,
               obscureText: _obscureNewPassword,
               decoration: InputDecoration(
-                labelText: 'Nouveau mot de passe',
+                labelText: 'New password',
                 prefixIcon: Icon(Icons.lock_outline),
                 suffixIcon: IconButton(
                   icon: Icon(_obscureNewPassword
@@ -553,7 +553,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
               controller: _confirmPasswordController,
               obscureText: _obscureConfirmPassword,
               decoration: InputDecoration(
-                labelText: 'Confirmer le mot de passe',
+                labelText: 'Confirm password',
                 prefixIcon: Icon(Icons.lock_reset),
                 suffixIcon: IconButton(
                   icon: Icon(_obscureConfirmPassword
@@ -577,11 +577,11 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
-      BoxShadow(
-      color: Colors.grey.shade200,
-        blurRadius: 8,
-        offset: Offset(0, 2),
-      )],
+          BoxShadow(
+            color: Colors.grey.shade200,
+            blurRadius: 8,
+            offset: Offset(0, 2),
+          )],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -591,7 +591,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
               Icon(Icons.timer, color: Colors.red),
               SizedBox(width: 8),
               Text(
-                'Paramètres Pomodoro',
+                'Pomodoro Settings',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -602,7 +602,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
           ),
           SizedBox(height: 20),
           _buildDurationSetting(
-            'Durée de travail',
+            'Work duration',
             _workDuration,
             'minutes',
             Colors.red,
@@ -610,7 +610,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
           ),
           SizedBox(height: 16),
           _buildDurationSetting(
-            'Pause courte',
+            'Short break',
             _shortBreakDuration,
             'minutes',
             Colors.green,
@@ -618,7 +618,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
           ),
           SizedBox(height: 16),
           _buildDurationSetting(
-            'Pause longue',
+            'Long break',
             _longBreakDuration,
             'minutes',
             Colors.blue,
@@ -647,7 +647,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Préférences de l\'application',
+            'App Preferences',
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
@@ -658,30 +658,30 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
           ListTile(
             leading: Icon(Icons.notifications, color: Colors.orange),
             title: Text('Notifications'),
-            subtitle: Text('Gérer les notifications push'),
+            subtitle: Text('Manage push notifications'),
             trailing: Switch(
               value: true,
-              onChanged: (value) => _showSnackBar('Notifications ${value ? 'activées' : 'désactivées'}'),
+              onChanged: (value) => _showSnackBar('Notifications ${value ? 'enabled' : 'disabled'}'),
             ),
           ),
           Divider(),
           ListTile(
             leading: Icon(Icons.vibration, color: Colors.purple),
             title: Text('Vibrations'),
-            subtitle: Text('Vibrer à la fin des sessions'),
+            subtitle: Text('Vibrate at session end'),
             trailing: Switch(
               value: true,
-              onChanged: (value) => _showSnackBar('Vibrations ${value ? 'activées' : 'désactivées'}'),
+              onChanged: (value) => _showSnackBar('Vibrations ${value ? 'enabled' : 'disabled'}'),
             ),
           ),
           Divider(),
           ListTile(
             leading: Icon(Icons.dark_mode, color: Colors.grey.shade700),
-            title: Text('Thème sombre'),
-            subtitle: Text('Basculer vers le mode sombre'),
+            title: Text('Dark theme'),
+            subtitle: Text('Switch to dark mode'),
             trailing: Switch(
               value: false,
-              onChanged: (value) => _showSnackBar('Thème sombre ${value ? 'activé' : 'désactivé'}'),
+              onChanged: (value) => _showSnackBar('Dark theme ${value ? 'enabled' : 'disabled'}'),
             ),
           ),
         ],
@@ -707,14 +707,14 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
         children: [
           ListTile(
             leading: Icon(Icons.help_outline, color: Colors.blue),
-            title: Text('Aide & Support'),
+            title: Text('Help & Support'),
             trailing: Icon(Icons.arrow_forward_ios, size: 16),
-            onTap: () => _showSnackBar('Redirection vers l\'aide...'),
+            onTap: () => _showSnackBar('Redirecting to help...'),
           ),
           Divider(),
           ListTile(
             leading: Icon(Icons.info_outline, color: Colors.grey),
-            title: Text('À propos'),
+            title: Text('About'),
             subtitle: Text('Version 1.0.0'),
             trailing: Icon(Icons.arrow_forward_ios, size: 16),
             onTap: _showAboutDialog,
@@ -723,7 +723,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
           ListTile(
             leading: Icon(Icons.logout, color: Colors.red),
             title: Text(
-              'Se déconnecter',
+              'Log out',
               style: TextStyle(color: Colors.red, fontWeight: FontWeight.w500),
             ),
             onTap: _showLogoutDialog,
@@ -732,7 +732,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
           ListTile(
             leading: Icon(Icons.delete, color: Colors.red),
             title: Text(
-              'Supprimer mon compte',
+              'Delete my account',
               style: TextStyle(color: Colors.red, fontWeight: FontWeight.w500),
             ),
             onTap: _showDeleteAccountDialog,
@@ -823,14 +823,14 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
           children: [
             Icon(Icons.delete, color: Colors.red),
             SizedBox(width: 8),
-            Text('Supprimer le compte'),
+            Text('Delete account'),
           ],
         ),
-        content: Text('Êtes-vous sûr de vouloir supprimer votre compte ? Cette action est irréversible.'),
+        content: Text('Are you sure you want to delete your account? This action is irreversible.'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('Annuler'),
+            child: Text('Cancel'),
           ),
           ElevatedButton(
             onPressed: () {
@@ -838,7 +838,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
               _deleteUserAccount();
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            child: Text('Supprimer'),
+            child: Text('Delete'),
           ),
         ],
       ),
@@ -854,14 +854,14 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
             children: [
               Icon(Icons.logout, color: Colors.red),
               SizedBox(width: 8),
-              Text('Se déconnecter'),
+              Text('Log out'),
             ],
           ),
-          content: Text('Êtes-vous sûr de vouloir vous déconnecter ?'),
+          content: Text('Are you sure you want to log out?'),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: Text('Annuler'),
+              child: Text('Cancel'),
             ),
             ElevatedButton(
               onPressed: () {
@@ -869,7 +869,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                 _logout();
               },
               style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-              child: Text('Se déconnecter'),
+              child: Text('Log out'),
             ),
           ],
         );
@@ -882,15 +882,15 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('À propos'),
+          title: Text('About'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Application Étudiante'),
+              Text('Student Application'),
               Text('Version 1.0.0'),
               SizedBox(height: 16),
-              Text('Développée pour améliorer la productivité des étudiants avec des outils de gestion du temps et d\'organisation.'),
+              Text('Developed to enhance student productivity with time management and organization tools.'),
             ],
           ),
           actions: [

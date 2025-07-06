@@ -82,15 +82,15 @@ class _StudyStatisticsScreenState extends State<StudyStatisticsScreen>
   bool _isLoading = true;
   String _errorMessage = '';
 
-  // Données pour le graphique
+  // Chart data
   final List<Map<String, dynamic>> weeklyData = [
-    {'day': 'Lun', 'minutes': 120},
-    {'day': 'Mar', 'minutes': 85},
-    {'day': 'Mer', 'minutes': 150},
-    {'day': 'Jeu', 'minutes': 95},
-    {'day': 'Ven', 'minutes': 180},
-    {'day': 'Sam', 'minutes': 60},
-    {'day': 'Dim', 'minutes': 45, 'isToday': true},
+    {'day': 'Mon', 'minutes': 120},
+    {'day': 'Tue', 'minutes': 85},
+    {'day': 'Wed', 'minutes': 150},
+    {'day': 'Thu', 'minutes': 95},
+    {'day': 'Fri', 'minutes': 180},
+    {'day': 'Sat', 'minutes': 60},
+    {'day': 'Sun', 'minutes': 45, 'isToday': true},
   ];
 
   @override
@@ -138,14 +138,14 @@ class _StudyStatisticsScreenState extends State<StudyStatisticsScreen>
         _weeklyStats = stats;
       });
 
-      // Démarrer les animations après le chargement des données
+      // Start animations after data loads
       _progressController.forward();
       Future.delayed(const Duration(milliseconds: 500), () {
         _chartController.forward();
       });
     } catch (e) {
       setState(() {
-        _errorMessage = 'Erreur de chargement: ${e.toString()}';
+        _errorMessage = 'Loading error: ${e.toString()}';
       });
     } finally {
       setState(() {
@@ -192,7 +192,7 @@ class _StudyStatisticsScreenState extends State<StudyStatisticsScreen>
       backgroundColor: const Color(0xFFF8F9FA),
       appBar: AppBar(
         title: const Text(
-          'Statistiques d\'étude',
+          'Study Statistics',
           style: TextStyle(
             fontWeight: FontWeight.bold,
             color: Colors.white,
@@ -216,22 +216,22 @@ class _StudyStatisticsScreenState extends State<StudyStatisticsScreen>
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Progression globale de la semaine
+            // Weekly overall progress
             _buildWeeklyProgressCard(),
 
             const SizedBox(height: 20),
 
-            // Statistiques rapides
+            // Quick statistics
             _buildQuickStatsRow(),
 
             const SizedBox(height: 20),
 
-            // Graphique en barres
+            // Bar chart
             _buildDailyBarChart(),
 
             const SizedBox(height: 20),
 
-            // Taux d'achèvement des tâches
+            // Task completion rate
             _buildTaskCompletionCard(),
           ],
         ),
@@ -267,7 +267,7 @@ class _StudyStatisticsScreenState extends State<StudyStatisticsScreen>
                 ),
                 const SizedBox(width: 8),
                 const Text(
-                  'Progression de la semaine',
+                  'Weekly Progress',
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
@@ -279,7 +279,7 @@ class _StudyStatisticsScreenState extends State<StudyStatisticsScreen>
 
             const SizedBox(height: 32),
 
-            // Cercle de progression
+            // Progress circle
             AnimatedBuilder(
               animation: _progressAnimation,
               builder: (context, child) {
@@ -315,7 +315,7 @@ class _StudyStatisticsScreenState extends State<StudyStatisticsScreen>
                             ),
                           ),
                           Text(
-                            'cette semaine',
+                            'this week',
                             style: TextStyle(
                               fontSize: 12,
                               color: Colors.white.withOpacity(0.7),
@@ -340,7 +340,7 @@ class _StudyStatisticsScreenState extends State<StudyStatisticsScreen>
         Expanded(
           child: _buildStatCard(
             icon: Icons.schedule,
-            title: 'Moyenne/jour',
+            title: 'Average/day',
             value: '${averageMinutesPerDay.toInt()} min',
             color: const Color(0xFF4CAF50),
           ),
@@ -349,7 +349,7 @@ class _StudyStatisticsScreenState extends State<StudyStatisticsScreen>
         Expanded(
           child: _buildStatCard(
             icon: Icons.done_all,
-            title: 'Tâches complétées',
+            title: 'Tasks completed',
             value: '${(taskCompletionRate * 100).toInt()}%',
             color: const Color(0xFFFF9800),
           ),
@@ -421,7 +421,7 @@ class _StudyStatisticsScreenState extends State<StudyStatisticsScreen>
                 ),
                 const SizedBox(width: 8),
                 const Text(
-                  'Minutes d\'étude par jour',
+                  'Study minutes per day',
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -432,11 +432,11 @@ class _StudyStatisticsScreenState extends State<StudyStatisticsScreen>
 
             const SizedBox(height: 24),
 
-            // Graphique en barres
+            // Bar chart
             AnimatedBuilder(
               animation: _chartAnimation,
               builder: (context, child) {
-                // Calculer la valeur maximale pour l'échelle
+                // Calculate max value for scale
                 final maxMinutes = weeklyData
                     .map((d) => d['minutes'] as int)
                     .reduce(math.max);
@@ -449,13 +449,12 @@ class _StudyStatisticsScreenState extends State<StudyStatisticsScreen>
                     children: weeklyData.map((data) {
                       final minutes = data['minutes'] as int;
                       final isToday = data['isToday'] == true;
-                      // CORRECTION DE SYNTAXE ICI
                       final barHeight = (minutes / maxMinutes) * 150 * _chartAnimation.value;
 
                       return Column(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
-                          // Valeur au-dessus de la barre
+                          // Value above bar
                           if (barHeight > 20)
                             Padding(
                               padding: const EdgeInsets.only(bottom: 4),
@@ -469,7 +468,7 @@ class _StudyStatisticsScreenState extends State<StudyStatisticsScreen>
                               ),
                             ),
 
-                          // Barre
+                          // Bar
                           Container(
                             width: 32,
                             height: barHeight,
@@ -493,7 +492,7 @@ class _StudyStatisticsScreenState extends State<StudyStatisticsScreen>
 
                           const SizedBox(height: 8),
 
-                          // Jour de la semaine
+                          // Day of week
                           Text(
                             data['day'] as String,
                             style: TextStyle(
@@ -536,7 +535,7 @@ class _StudyStatisticsScreenState extends State<StudyStatisticsScreen>
                 ),
                 const SizedBox(width: 8),
                 const Text(
-                  'Taux d\'achèvement des tâches',
+                  'Task completion rate',
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -547,7 +546,7 @@ class _StudyStatisticsScreenState extends State<StudyStatisticsScreen>
 
             const SizedBox(height: 24),
 
-            // Barre de progression horizontale
+            // Horizontal progress bar
             AnimatedBuilder(
               animation: _progressAnimation,
               builder: (context, child) {
@@ -559,7 +558,7 @@ class _StudyStatisticsScreenState extends State<StudyStatisticsScreen>
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          'Tâches complétées',
+                          'Tasks completed',
                           style: TextStyle(
                             fontSize: 14,
                             color: Colors.grey[600],
@@ -604,7 +603,7 @@ class _StudyStatisticsScreenState extends State<StudyStatisticsScreen>
 
                     const SizedBox(height: 16),
 
-                    // Détails supplémentaires
+                    // Additional details
                     Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
@@ -622,8 +621,8 @@ class _StudyStatisticsScreenState extends State<StudyStatisticsScreen>
                           Expanded(
                             child: Text(
                               progressValue > 0.7
-                                  ? 'Excellent travail! Vous êtes sur la bonne voie pour atteindre vos objectifs.'
-                                  : 'Continuez vos efforts! Vous êtes en bonne voie pour atteindre vos objectifs.',
+                                  ? 'Excellent work! You\'re on track to achieve your goals.'
+                                  : 'Keep up the effort! You\'re making good progress toward your goals.',
                               style: TextStyle(
                                 fontSize: 13,
                                 color: Colors.grey[700],
@@ -644,7 +643,7 @@ class _StudyStatisticsScreenState extends State<StudyStatisticsScreen>
   }
 }
 
-// Custom Painter pour le cercle de progression
+// Custom Painter for progress circle
 class CircularProgressPainter extends CustomPainter {
   final double progress;
   final Color backgroundColor;
@@ -663,7 +662,7 @@ class CircularProgressPainter extends CustomPainter {
     final center = Offset(size.width / 2, size.height / 2);
     final radius = (size.width - strokeWidth) / 2;
 
-    // Cercle de fond
+    // Background circle
     final backgroundPaint = Paint()
       ..color = backgroundColor
       ..strokeWidth = strokeWidth
@@ -672,7 +671,7 @@ class CircularProgressPainter extends CustomPainter {
 
     canvas.drawCircle(center, radius, backgroundPaint);
 
-    // Arc de progression
+    // Progress arc
     final foregroundPaint = Paint()
       ..color = foregroundColor
       ..strokeWidth = strokeWidth
@@ -682,7 +681,7 @@ class CircularProgressPainter extends CustomPainter {
     final sweepAngle = 2 * math.pi * progress;
     canvas.drawArc(
       Rect.fromCircle(center: center, radius: radius),
-      -math.pi / 2, // Commencer en haut
+      -math.pi / 2, // Start at top
       sweepAngle,
       false,
       foregroundPaint,

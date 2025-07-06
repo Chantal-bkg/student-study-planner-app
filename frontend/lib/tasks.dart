@@ -19,6 +19,7 @@ class EditionTaches extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
         fontFamily: 'Roboto',
+        scaffoldBackgroundColor: Colors.white,
       ),
       home: TaskList(),
       debugShowCheckedModeBanner: false,
@@ -48,12 +49,10 @@ class StudyTask {
   });
 
   factory StudyTask.fromJson(Map<String, dynamic> json) {
-    // Gestion robuste des valeurs nulles
     final id = json['_id'] ?? json['id'] ?? '';
-    final title = json['title']?.toString() ?? 'Sans titre';
-    final description = json['description']?.toString() ?? 'Pas de description';
+    final title = json['title']?.toString() ?? 'Untitled';
+    final description = json['description']?.toString() ?? 'No description';
 
-    // Gestion de la date avec valeur par défaut si null
     DateTime parseDate(dynamic dateValue) {
       if (dateValue == null) return DateTime.now();
       try {
@@ -63,7 +62,6 @@ class StudyTask {
       }
     }
 
-    // Gestion des nombres avec valeur par défaut si null
     final duration = json['duration'] is int?
         ? json['duration'] ?? 30
         : int.tryParse(json['duration']?.toString() ?? '') ?? 30;
@@ -123,7 +121,7 @@ class _TaskListState extends State<TaskList> {
 
       final userId = await _getUserId();
       if (userId == null) {
-        _showErrorDialog('Utilisateur non identifié');
+        _showErrorDialog('User not identified');
         return;
       }
 
@@ -144,12 +142,12 @@ class _TaskListState extends State<TaskList> {
         _handleUnauthorizedError();
       } else {
         final errorBody = json.decode(response.body);
-        throw Exception(errorBody['message'] ?? 'Erreur serveur: ${response.statusCode}');
+        throw Exception(errorBody['message'] ?? 'Server error: ${response.statusCode}');
       }
     } catch (e) {
       setState(() {
         _isLoading = false;
-        _errorMessage = 'Erreur lors du chargement: ${e.toString()}';
+        _errorMessage = 'Loading error: ${e.toString()}';
       });
     }
   }
@@ -168,8 +166,8 @@ class _TaskListState extends State<TaskList> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Session expirée'),
-        content: Text('Votre session a expiré. Veuillez vous reconnecter.'),
+        title: Text('Session expired'),
+        content: Text('Your session has expired. Please log in again.'),
         actions: [
           TextButton(
             onPressed: () async {
@@ -182,7 +180,7 @@ class _TaskListState extends State<TaskList> {
                     (route) => false,
               );
             },
-            child: Text('Se reconnecter'),
+            child: Text('Log in'),
           ),
         ],
       ),
@@ -193,7 +191,7 @@ class _TaskListState extends State<TaskList> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Erreur'),
+        title: Text('Error'),
         content: Text(message),
         actions: [
           TextButton(
@@ -217,7 +215,7 @@ class _TaskListState extends State<TaskList> {
     );
 
     if (result == true) {
-      _loadTasks();
+      await _loadTasks(); // Add await to ensure reload
     }
   }
 
@@ -230,7 +228,7 @@ class _TaskListState extends State<TaskList> {
     );
 
     if (result == true) {
-      _loadTasks();
+      await _loadTasks(); // Add await to ensure reload
     }
   }
 
@@ -238,16 +236,16 @@ class _TaskListState extends State<TaskList> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Confirmer la suppression'),
-        content: Text('Êtes-vous sûr de vouloir supprimer cette tâche ?'),
+        title: Text('Confirm deletion'),
+        content: Text('Are you sure you want to delete this task?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: Text('Annuler'),
+            child: Text('Cancel'),
           ),
           TextButton(
             onPressed: () => Navigator.of(context).pop(true),
-            child: Text('Supprimer', style: TextStyle(color: Colors.red)),
+            child: Text('Delete', style: TextStyle(color: Colors.red)),
           ),
         ],
       ),
@@ -272,15 +270,15 @@ class _TaskListState extends State<TaskList> {
       );
 
       if (response.statusCode == 200) {
-        _loadTasks();
+        await _loadTasks(); // Add await to ensure reload
       } else if (response.statusCode == 401) {
         _handleUnauthorizedError();
       } else {
         final errorBody = json.decode(response.body);
-        throw Exception(errorBody['message'] ?? 'Échec de la suppression');
+        throw Exception(errorBody['message'] ?? 'Deletion failed');
       }
     } catch (e) {
-      _showErrorDialog('Erreur lors de la suppression: ${e.toString()}');
+      _showErrorDialog('Deletion error: ${e.toString()}');
     }
   }
 
@@ -308,15 +306,15 @@ class _TaskListState extends State<TaskList> {
       );
 
       if (response.statusCode == 200) {
-        _loadTasks();
+        await _loadTasks(); // Add await to ensure reload
       } else if (response.statusCode == 401) {
         _handleUnauthorizedError();
       } else {
         final errorBody = json.decode(response.body);
-        throw Exception(errorBody['message'] ?? 'Échec de la mise à jour');
+        throw Exception(errorBody['message'] ?? 'Update failed');
       }
     } catch (e) {
-      _showErrorDialog('Erreur lors de la mise à jour: ${e.toString()}');
+      _showErrorDialog('Update error: ${e.toString()}');
     }
   }
 
@@ -341,26 +339,26 @@ class _TaskListState extends State<TaskList> {
       );
 
       if (response.statusCode == 200) {
-        _loadTasks();
+        await _loadTasks(); // Add await to ensure reload
       } else if (response.statusCode == 401) {
         _handleUnauthorizedError();
       } else {
         final errorBody = json.decode(response.body);
-        throw Exception(errorBody['message'] ?? 'Échec de la mise à jour');
+        throw Exception(errorBody['message'] ?? 'Update failed');
       }
     } catch (e) {
-      print('Erreur lors de la mise à jour: ${e.toString()}');
+      print('Update error: ${e.toString()}');
     }
   }
 
   String _getStatusText(String status) {
     switch (status) {
       case 'pending':
-        return 'En attente';
+        return 'Pending';
       case 'in_progress':
-        return 'En cours';
+        return 'In Progress';
       case 'completed':
-        return 'Terminée';
+        return 'Completed';
       default:
         return status;
     }
@@ -382,8 +380,9 @@ class _TaskListState extends State<TaskList> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text('Mes Tâches'),
+        title: Text('My Tasks'),
         actions: [
           IconButton(
             icon: Icon(Icons.refresh),
@@ -421,7 +420,7 @@ class _TaskListState extends State<TaskList> {
               SizedBox(height: 16),
               ElevatedButton(
                 onPressed: _loadTasks,
-                child: Text('Réessayer'),
+                child: Text('Retry'),
               ),
             ],
           ),
@@ -435,12 +434,12 @@ class _TaskListState extends State<TaskList> {
             Icon(Icons.task, size: 64, color: Colors.grey),
             SizedBox(height: 16),
             Text(
-              'Aucune tâche trouvée',
+              'No tasks found',
               style: TextStyle(fontSize: 18, color: Colors.grey),
             ),
             SizedBox(height: 8),
             Text(
-              'Commencez par créer une nouvelle tâche',
+              'Start by creating a new task',
               style: TextStyle(color: Colors.grey),
             ),
           ],
@@ -485,7 +484,7 @@ class _TaskListState extends State<TaskList> {
                           Icon(Icons.calendar_today, size: 14),
                           SizedBox(width: 4),
                           Text(
-                            '${task.dateTime.day}/${task.dateTime.month}/${task.dateTime.year} à ${task.dateTime.hour}:${task.dateTime.minute.toString().padLeft(2, '0')}',
+                            '${task.dateTime.day}/${task.dateTime.month}/${task.dateTime.year} at ${task.dateTime.hour}:${task.dateTime.minute.toString().padLeft(2, '0')}',
                             style: TextStyle(fontSize: 12),
                           ),
                           SizedBox(width: 8),
@@ -572,7 +571,7 @@ class _StudyTaskFormScreenState extends State<StudyTaskFormScreen> {
   bool _isSaving = false;
   String _currentStatus = 'pending';
 
-  // URL de base de l'API
+  // API base URL
   final String _baseUrl = 'http://10.0.2.2:5002/api/tasks';
 
   @override
@@ -611,7 +610,7 @@ class _StudyTaskFormScreenState extends State<StudyTaskFormScreen> {
 
         final userId = await _getUserId();
         if (userId == null) {
-          _showErrorDialog('Utilisateur non identifié');
+          _showErrorDialog('User not identified');
           return;
         }
 
@@ -658,12 +657,12 @@ class _StudyTaskFormScreenState extends State<StudyTaskFormScreen> {
           _handleUnauthorizedError();
         } else {
           final errorData = json.decode(response.body);
-          _showErrorDialog(errorData['message'] ?? 'Erreur inconnue: ${response.statusCode}');
+          _showErrorDialog(errorData['message'] ?? 'Unknown error: ${response.statusCode}');
         }
       } on http.ClientException catch (e) {
-        _showErrorDialog('Erreur réseau: ${e.message}');
+        _showErrorDialog('Network error: ${e.message}');
       } catch (e) {
-        _showErrorDialog('Erreur inattendue: $e');
+        _showErrorDialog('Unexpected error: $e');
       } finally {
         setState(() => _isSaving = false);
       }
@@ -674,16 +673,16 @@ class _StudyTaskFormScreenState extends State<StudyTaskFormScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Confirmer la suppression'),
-        content: Text('Êtes-vous sûr de vouloir supprimer cette tâche ?'),
+        title: Text('Confirm deletion'),
+        content: Text('Are you sure you want to delete this task?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: Text('Annuler'),
+            child: Text('Cancel'),
           ),
           TextButton(
             onPressed: () => Navigator.of(context).pop(true),
-            child: Text('Supprimer', style: TextStyle(color: Colors.red)),
+            child: Text('Delete', style: TextStyle(color: Colors.red)),
           ),
         ],
       ),
@@ -715,10 +714,10 @@ class _StudyTaskFormScreenState extends State<StudyTaskFormScreen> {
         _handleUnauthorizedError();
       } else {
         final errorData = json.decode(response.body);
-        _showErrorDialog(errorData['message'] ?? 'Erreur lors de la suppression: ${response.statusCode}');
+        _showErrorDialog(errorData['message'] ?? 'Deletion error: ${response.statusCode}');
       }
     } catch (e) {
-      _showErrorDialog('Erreur: $e');
+      _showErrorDialog('Error: $e');
     } finally {
       setState(() => _isSaving = false);
     }
@@ -728,8 +727,8 @@ class _StudyTaskFormScreenState extends State<StudyTaskFormScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Session expirée'),
-        content: Text('Votre session a expiré. Veuillez vous reconnecter.'),
+        title: Text('Session expired'),
+        content: Text('Your session has expired. Please log in again.'),
         actions: [
           TextButton(
             onPressed: () async {
@@ -742,7 +741,7 @@ class _StudyTaskFormScreenState extends State<StudyTaskFormScreen> {
                     (route) => false,
               );
             },
-            child: Text('Se reconnecter'),
+            child: Text('Log in'),
           ),
         ],
       ),
@@ -752,11 +751,11 @@ class _StudyTaskFormScreenState extends State<StudyTaskFormScreen> {
   String _getStatusText(String status) {
     switch (status) {
       case 'pending':
-        return 'En attente';
+        return 'Pending';
       case 'in_progress':
-        return 'En cours';
+        return 'In Progress';
       case 'completed':
-        return 'Terminée';
+        return 'Completed';
       default:
         return status;
     }
@@ -765,151 +764,143 @@ class _StudyTaskFormScreenState extends State<StudyTaskFormScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              Color(0xFFF5E6A8),
-              Color(0xFFE8D578),
-              Color(0xFFDBC649),
-            ],
-          ),
-        ),
-        child: SafeArea(
-          child: Column(
-            children: [
-              // App Bar personnalisée
-              _buildCustomAppBar(),
+      backgroundColor: Colors.white,
+      body: SafeArea(
+        child: Column(
+          children: [
+            // Custom App Bar
+            _buildCustomAppBar(),
 
-              // Formulaire
-              Expanded(
-                child: SingleChildScrollView(
-                  padding: EdgeInsets.all(20.0),
-                  child: Card(
-                    elevation: 8,
-                    shape: RoundedRectangleBorder(
+            // Form
+            Expanded(
+              child: SingleChildScrollView(
+                padding: EdgeInsets.all(20.0),
+                child: Card(
+                  elevation: 8,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Container(
+                    padding: EdgeInsets.all(24.0),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
                       borderRadius: BorderRadius.circular(16),
                     ),
-                    child: Padding(
-                      padding: EdgeInsets.all(24.0),
-                      child: Form(
-                        key: _formKey,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // Icône et titre de la section
-                            Row(
-                              children: [
-                                Container(
-                                  padding: EdgeInsets.all(12),
-                                  decoration: BoxDecoration(
-                                    color: Color(0xFFE8D578).withOpacity(0.2),
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  child: Icon(
-                                    Icons.assignment,
-                                    color: Color(0xFF2C3E50),
-                                    size: 24,
-                                  ),
+                    child: Form(
+                      key: _formKey,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Section icon and title
+                          Row(
+                            children: [
+                              Container(
+                                padding: EdgeInsets.all(12),
+                                decoration: BoxDecoration(
+                                  color: Color(0xFFE8D578).withOpacity(0.2),
+                                  borderRadius: BorderRadius.circular(12),
                                 ),
-                                SizedBox(width: 16),
-                                Text(
-                                  widget.isEditing ? 'Modifier la tâche' : 'Nouvelle tâche d\'étude',
-                                  style: TextStyle(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold,
-                                    color: Color(0xFF2C3E50),
-                                  ),
+                                child: Icon(
+                                  Icons.assignment,
+                                  color: Color(0xFF2C3E50),
+                                  size: 24,
                                 ),
-                              ],
-                            ),
-                            SizedBox(height: 32),
-
-                            // Champ Titre
-                            _buildSectionLabel('Titre'),
-                            SizedBox(height: 8),
-                            _buildTextFormField(
-                              controller: _titleController,
-                              hintText: 'Ex: Révision Mathématiques',
-                              icon: Icons.title,
-                              validator: (value) {
-                                if (value == null || value.trim().isEmpty) {
-                                  return 'Le titre est obligatoire';
-                                }
-                                return null;
-                              },
-                            ),
-                            SizedBox(height: 24),
-
-                            // Champ Description
-                            _buildSectionLabel('Description'),
-                            SizedBox(height: 8),
-                            _buildTextFormField(
-                              controller: _descriptionController,
-                              hintText: 'Détails de la tâche d\'étude...',
-                              icon: Icons.description,
-                              maxLines: 3,
-                              validator: (value) {
-                                if (value == null || value.trim().isEmpty) {
-                                  return 'La description est obligatoire';
-                                }
-                                return null;
-                              },
-                            ),
-                            SizedBox(height: 24),
-
-                            // Date et heure
-                            _buildSectionLabel('Date et heure'),
-                            SizedBox(height: 8),
-                            _buildDateTimeSelector(),
-                            SizedBox(height: 24),
-
-                            // Durée
-                            _buildSectionLabel('Durée (en minutes)'),
-                            SizedBox(height: 8),
-                            _buildTextFormField(
-                              controller: _durationController,
-                              hintText: 'Ex: 60',
-                              icon: Icons.timer,
-                              keyboardType: TextInputType.number,
-                              validator: (value) {
-                                if (value == null || value.trim().isEmpty) {
-                                  return 'La durée est obligatoire';
-                                }
-                                int? duration = int.tryParse(value);
-                                if (duration == null || duration <= 0) {
-                                  return 'Veuillez entrer une durée valide';
-                                }
-                                return null;
-                              },
-                            ),
-                            SizedBox(height: 24),
-
-                            // Statut
-                            _buildSectionLabel('Statut'),
-                            SizedBox(height: 8),
-                            _buildStatusDropdown(),
-                            SizedBox(height: 40),
-
-                            // Bouton Enregistrer
-                            _buildSaveButton(),
-
-                            // Bouton Supprimer (visible seulement en mode édition)
-                            if (widget.isEditing) ...[
-                              SizedBox(height: 16),
-                              _buildDeleteButton(),
+                              ),
+                              SizedBox(width: 16),
+                              Text(
+                                widget.isEditing ? 'Edit Task' : 'New Study Task',
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xFF2C3E50),
+                                ),
+                              ),
                             ],
+                          ),
+                          SizedBox(height: 32),
+
+                          // Title field
+                          _buildSectionLabel('Title'),
+                          SizedBox(height: 8),
+                          _buildTextFormField(
+                            controller: _titleController,
+                            hintText: 'Ex: Math Revision',
+                            icon: Icons.title,
+                            validator: (value) {
+                              if (value == null || value.trim().isEmpty) {
+                                return 'Title is required';
+                              }
+                              return null;
+                            },
+                          ),
+                          SizedBox(height: 24),
+
+                          // Description field
+                          _buildSectionLabel('Description'),
+                          SizedBox(height: 8),
+                          _buildTextFormField(
+                            controller: _descriptionController,
+                            hintText: 'Study task details...',
+                            icon: Icons.description,
+                            maxLines: 3,
+                            validator: (value) {
+                              if (value == null || value.trim().isEmpty) {
+                                return 'Description is required';
+                              }
+                              return null;
+                            },
+                          ),
+                          SizedBox(height: 24),
+
+                          // Date and time
+                          _buildSectionLabel('Date and Time'),
+                          SizedBox(height: 8),
+                          _buildDateTimeSelector(),
+                          SizedBox(height: 24),
+
+                          // Duration
+                          _buildSectionLabel('Duration (minutes)'),
+                          SizedBox(height: 8),
+                          _buildTextFormField(
+                            controller: _durationController,
+                            hintText: 'Ex: 60',
+                            icon: Icons.timer,
+                            keyboardType: TextInputType.number,
+                            validator: (value) {
+                              if (value == null || value.trim().isEmpty) {
+                                return 'Duration is required';
+                              }
+                              int? duration = int.tryParse(value);
+                              if (duration == null || duration <= 0) {
+                                return 'Please enter a valid duration';
+                              }
+                              return null;
+                            },
+                          ),
+                          SizedBox(height: 24),
+
+                          // Status
+                          _buildSectionLabel('Status'),
+                          SizedBox(height: 8),
+                          _buildStatusDropdown(),
+                          SizedBox(height: 40),
+
+                          // Save button
+                          _buildSaveButton(),
+
+                          // Delete button (visible only in edit mode)
+                          if (widget.isEditing) ...[
+                            SizedBox(height: 16),
+                            _buildDeleteButton(),
                           ],
-                        ),
+                        ],
                       ),
                     ),
                   ),
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -922,7 +913,7 @@ class _StudyTaskFormScreenState extends State<StudyTaskFormScreen> {
         children: [
           IconButton(
             onPressed: () {
-              Navigator.pop(context);
+              Navigator.of(context).pop(false);
             },
             icon: Icon(
               Icons.arrow_back_ios,
@@ -931,7 +922,7 @@ class _StudyTaskFormScreenState extends State<StudyTaskFormScreen> {
           ),
           Expanded(
             child: Text(
-              widget.isEditing ? 'Éditer tâche' : 'Créer tâche',
+              widget.isEditing ? 'Edit Task' : 'Create Task',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
@@ -1058,7 +1049,7 @@ class _StudyTaskFormScreenState extends State<StudyTaskFormScreen> {
         ),
         validator: (value) {
           if (value == null || value.isEmpty) {
-            return 'Veuillez sélectionner un statut';
+            return 'Please select a status';
           }
           return null;
         },
@@ -1095,7 +1086,7 @@ class _StudyTaskFormScreenState extends State<StudyTaskFormScreen> {
             Icon(Icons.save, size: 20),
             SizedBox(width: 8),
             Text(
-              'Enregistrer',
+              'Save',
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
@@ -1136,7 +1127,7 @@ class _StudyTaskFormScreenState extends State<StudyTaskFormScreen> {
             Icon(Icons.delete, size: 20),
             SizedBox(width: 8),
             Text(
-              'Supprimer',
+              'Delete',
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
@@ -1149,11 +1140,11 @@ class _StudyTaskFormScreenState extends State<StudyTaskFormScreen> {
   }
 
   String _formatDateTime(DateTime dateTime) {
-    return '${dateTime.day}/${dateTime.month}/${dateTime.year} à ${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}';
+    return '${dateTime.day}/${dateTime.month}/${dateTime.year} at ${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}';
   }
 
   Future<void> _selectDateTime() async {
-    // Sélection de la date
+    // Date selection
     final DateTime? pickedDate = await showDatePicker(
       context: context,
       initialDate: _selectedDateTime,
@@ -1173,7 +1164,7 @@ class _StudyTaskFormScreenState extends State<StudyTaskFormScreen> {
     );
 
     if (pickedDate != null) {
-      // Sélection de l'heure
+      // Time selection
       final TimeOfDay? pickedTime = await showTimePicker(
         context: context,
         initialTime: TimeOfDay.fromDateTime(_selectedDateTime),
@@ -1209,6 +1200,7 @@ class _StudyTaskFormScreenState extends State<StudyTaskFormScreen> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
+          backgroundColor: Colors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
@@ -1221,7 +1213,7 @@ class _StudyTaskFormScreenState extends State<StudyTaskFormScreen> {
               ),
               SizedBox(width: 12),
               Text(
-                widget.isEditing ? 'Tâche modifiée' : 'Tâche créée',
+                widget.isEditing ? 'Task updated' : 'Task created',
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                 ),
@@ -1232,20 +1224,22 @@ class _StudyTaskFormScreenState extends State<StudyTaskFormScreen> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Titre: ${task.title}'),
+              Text('Title: ${task.title}'),
               SizedBox(height: 8),
               Text('Date: ${_formatDateTime(task.dateTime)}'),
               SizedBox(height: 8),
-              Text('Durée: ${task.durationMinutes} minutes'),
+              Text('Duration: ${task.durationMinutes} minutes'),
               SizedBox(height: 8),
-              Text('Statut: ${_getStatusText(task.status)}'),
+              Text('Status: ${_getStatusText(task.status)}'),
             ],
           ),
           actions: [
             TextButton(
               onPressed: () {
+                // Close dialog first
                 Navigator.of(context).pop();
-                Navigator.of(context).pop(true);
+                // Then close form screen with true result
+                //Navigator.of(context).pop(true);
               },
               child: Text(
                 'OK',
@@ -1262,12 +1256,15 @@ class _StudyTaskFormScreenState extends State<StudyTaskFormScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Tâche supprimée'),
-        content: Text('La tâche a été supprimée avec succès.'),
+        backgroundColor: Colors.white,
+        title: Text('Task deleted'),
+        content: Text('Task was successfully deleted.'),
         actions: [
           TextButton(
             onPressed: () {
+              // Close dialog first
               Navigator.of(context).pop();
+              // Then close form screen with true result
               Navigator.of(context).pop(true);
             },
             child: Text('OK'),
@@ -1281,7 +1278,8 @@ class _StudyTaskFormScreenState extends State<StudyTaskFormScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Erreur'),
+        backgroundColor: Colors.white,
+        title: Text('Error'),
         content: Text(message),
         actions: [
           TextButton(
@@ -1314,9 +1312,9 @@ class PomodoroTimer extends StatefulWidget {
 class _PomodoroTimerState extends State<PomodoroTimer>
     with TickerProviderStateMixin {
   // Timer configuration
-  late int WORK_DURATION; // Initialisé dans initState
-  static const int SHORT_BREAK = 5 * 60; // 5 minutes en secondes
-  static const int LONG_BREAK = 15 * 60; // 15 minutes
+  late int WORK_DURATION;
+  static const int SHORT_BREAK = 5 * 60;
+  static const int LONG_BREAK = 15 * 60;
 
   // Timer state
   Timer? _timer;
@@ -1326,8 +1324,8 @@ class _PomodoroTimerState extends State<PomodoroTimer>
 
   // Pomodoro session tracking
   int _pomodoroCount = 0;
-  String _currentPhase = "Travail";
-  String _currentTask = "Concentrez-vous sur votre tâche";
+  String _currentPhase = "Work";
+  String _currentTask = "Focus on your task";
 
   // Animation controllers
   late AnimationController _pulseController;
@@ -1346,7 +1344,6 @@ class _PomodoroTimerState extends State<PomodoroTimer>
   void initState() {
     super.initState();
 
-    // Initialiser la durée de travail avec la tâche
     WORK_DURATION = widget.task.durationMinutes * 60;
     _timeRemaining = WORK_DURATION;
     _currentTask = widget.task.title;
@@ -1380,7 +1377,7 @@ class _PomodoroTimerState extends State<PomodoroTimer>
 
     _pulseController.repeat(reverse: true);
 
-    // Mettre à jour le statut de la tâche à "en cours"
+    // Update task status to "in progress"
     _updateTaskStatus('in_progress');
   }
 
@@ -1403,10 +1400,10 @@ class _PomodoroTimerState extends State<PomodoroTimer>
       );
 
       if (response.statusCode == 200) {
-        print('Statut de la tâche mis à jour: $status');
+        print('Task status updated: $status');
       }
     } catch (e) {
-      print('Erreur lors de la mise à jour du statut: $e');
+      print('Status update error: $e');
     }
   }
 
@@ -1472,8 +1469,8 @@ class _PomodoroTimerState extends State<PomodoroTimer>
     // Vibration and notification
     _triggerNotification();
 
-    // Mettre à jour le statut de la tâche à "terminé"
-    if (_currentPhase == "Travail") {
+    // Update task status to "completed"
+    if (_currentPhase == "Work") {
       await _updateTaskStatus('completed');
     }
 
@@ -1483,17 +1480,17 @@ class _PomodoroTimerState extends State<PomodoroTimer>
 
   void _moveToNextPhase() {
     setState(() {
-      if (_currentPhase == "Travail") {
+      if (_currentPhase == "Work") {
         _pomodoroCount++;
         if (_pomodoroCount % 4 == 0) {
-          _currentPhase = "Pause longue";
+          _currentPhase = "Long Break";
           _timeRemaining = LONG_BREAK;
         } else {
-          _currentPhase = "Pause courte";
+          _currentPhase = "Short Break";
           _timeRemaining = SHORT_BREAK;
         }
       } else {
-        _currentPhase = "Travail";
+        _currentPhase = "Work";
         _timeRemaining = WORK_DURATION;
       }
     });
@@ -1502,11 +1499,11 @@ class _PomodoroTimerState extends State<PomodoroTimer>
 
   int _getCurrentPhaseDuration() {
     switch (_currentPhase) {
-      case "Travail":
+      case "Work":
         return WORK_DURATION;
-      case "Pause courte":
+      case "Short Break":
         return SHORT_BREAK;
-      case "Pause longue":
+      case "Long Break":
         return LONG_BREAK;
       default:
         return WORK_DURATION;
@@ -1528,27 +1525,28 @@ class _PomodoroTimerState extends State<PomodoroTimer>
       barrierDismissible: false,
       builder: (BuildContext context) {
         return AlertDialog(
+          backgroundColor: Colors.white,
           title: Row(
             children: [
               Icon(
-                _currentPhase == "Travail" ? Icons.work : Icons.coffee,
+                _currentPhase == "Work" ? Icons.work : Icons.coffee,
                 color: _getPhaseColor(),
               ),
               SizedBox(width: 10),
-              Text('Session terminée !'),
+              Text('Session completed!'),
             ],
           ),
           content: Text(
-            _currentPhase == "Travail"
-                ? 'Temps de faire une pause ! 🎉'
-                : 'C\'est reparti pour le travail ! 💪',
+            _currentPhase == "Work"
+                ? 'Time for a break! 🎉'
+                : 'Back to work! 💪',
           ),
           actions: [
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: Text('Continuer'),
+              child: Text('Continue'),
             ),
           ],
         );
@@ -1564,11 +1562,11 @@ class _PomodoroTimerState extends State<PomodoroTimer>
 
   Color _getPhaseColor() {
     switch (_currentPhase) {
-      case "Travail":
+      case "Work":
         return Colors.red;
-      case "Pause courte":
+      case "Short Break":
         return Colors.green;
-      case "Pause longue":
+      case "Long Break":
         return Colors.blue;
       default:
         return Colors.red;
@@ -1578,16 +1576,16 @@ class _PomodoroTimerState extends State<PomodoroTimer>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey.shade50,
+      backgroundColor: Colors.white,
       appBar: AppBar(
+        backgroundColor: _getPhaseColor(),
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () {
             Navigator.of(context).pop(true);
           },
         ),
-        title: Text('Minuteur Pomodoro'),
-        backgroundColor: _getPhaseColor(),
+        title: Text('Pomodoro Timer'),
         elevation: 0,
         actions: [
           IconButton(
@@ -1596,256 +1594,259 @@ class _PomodoroTimerState extends State<PomodoroTimer>
           ),
         ],
       ),
-      body: SafeArea(
-        child: Padding(
-          padding: EdgeInsets.all(20),
-          child: Column(
-            children: [
-              // Phase indicator
-              Container(
-                width: double.infinity,
-                padding: EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: _getPhaseColor().withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: _getPhaseColor().withOpacity(0.3),
-                    width: 2,
+      body: Container(
+        color: Colors.white,
+        child: SafeArea(
+          child: Padding(
+            padding: EdgeInsets.all(20),
+            child: Column(
+              children: [
+                // Phase indicator
+                Container(
+                  width: double.infinity,
+                  padding: EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: _getPhaseColor().withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: _getPhaseColor().withOpacity(0.3),
+                      width: 2,
+                    ),
                   ),
-                ),
-                child: Column(
-                  children: [
-                    Text(
-                      _currentPhase.toUpperCase(),
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: _getPhaseColor(),
-                        letterSpacing: 2,
-                      ),
-                    ),
-                    SizedBox(height: 8),
-                    Text(
-                      'Session ${_pomodoroCount + 1}',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.grey.shade600,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              SizedBox(height: 40),
-
-              // Timer display
-              Expanded(
-                child: Center(
-                  child: AnimatedBuilder(
-                    animation: _isRunning ? _pulseAnimation : _progressAnimation,
-                    builder: (context, child) {
-                      return Transform.scale(
-                        scale: _isRunning ? _pulseAnimation.value : 1.0,
-                        child: Stack(
-                          alignment: Alignment.center,
-                          children: [
-                            // Progress circle
-                            SizedBox(
-                              width: 250,
-                              height: 250,
-                              child: AnimatedBuilder(
-                                animation: _progressAnimation,
-                                builder: (context, child) {
-                                  return CircularProgressIndicator(
-                                    value: _progressAnimation.value,
-                                    strokeWidth: 8,
-                                    backgroundColor: Colors.grey.shade300,
-                                    valueColor: AlwaysStoppedAnimation<Color>(
-                                      _getPhaseColor(),
-                                    ),
-                                  );
-                                },
-                              ),
-                            ),
-                            // Timer text
-                            Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(
-                                  _formatTime(_timeRemaining),
-                                  style: TextStyle(
-                                    fontSize: 48,
-                                    fontWeight: FontWeight.bold,
-                                    color: _getPhaseColor(),
-                                    fontFeatures: [FontFeature.tabularFigures()],
-                                  ),
-                                ),
-                                SizedBox(height: 8),
-                                if (_isRunning)
-                                  Container(
-                                    padding: EdgeInsets.symmetric(
-                                      horizontal: 12,
-                                      vertical: 4,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: _getPhaseColor().withOpacity(0.1),
-                                      borderRadius: BorderRadius.circular(20),
-                                    ),
-                                    child: Text(
-                                      'EN COURS',
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.bold,
-                                        color: _getPhaseColor(),
-                                        letterSpacing: 1,
-                                      ),
-                                    ),
-                                  ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                  ),
-                ),
-              ),
-
-              // Current task display
-              Container(
-                width: double.infinity,
-                padding: EdgeInsets.all(16),
-                margin: EdgeInsets.only(bottom: 20),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.shade200,
-                      blurRadius: 8,
-                      offset: Offset(0, 2),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'Tâche actuelle',
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                            color: Colors.grey.shade600,
-                          ),
-                        ),
-                        IconButton(
-                          icon: Icon(Icons.edit, size: 18),
-                          onPressed: () {
-                            setState(() {
-                              _showTaskInput = !_showTaskInput;
-                            });
-                          },
-                        ),
-                      ],
-                    ),
-                    if (_showTaskInput) ...[
-                      SizedBox(height: 8),
-                      TextField(
-                        controller: _taskController,
-                        decoration: InputDecoration(
-                          hintText: 'Entrez votre tâche...',
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          contentPadding: EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 8,
-                          ),
-                        ),
-                        onSubmitted: (value) {
-                          setState(() {
-                            _currentTask = value.isNotEmpty
-                                ? value
-                                : widget.task.title;
-                            _showTaskInput = false;
-                          });
-                        },
-                      ),
-                    ] else ...[
-                      SizedBox(height: 4),
+                  child: Column(
+                    children: [
                       Text(
-                        _currentTask,
+                        _currentPhase.toUpperCase(),
                         style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.grey.shade800,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: _getPhaseColor(),
+                          letterSpacing: 2,
+                        ),
+                      ),
+                      SizedBox(height: 8),
+                      Text(
+                        'Session ${_pomodoroCount + 1}',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey.shade600,
                         ),
                       ),
                     ],
+                  ),
+                ),
+
+                SizedBox(height: 40),
+
+                // Timer display
+                Expanded(
+                  child: Center(
+                    child: AnimatedBuilder(
+                      animation: _isRunning ? _pulseAnimation : _progressAnimation,
+                      builder: (context, child) {
+                        return Transform.scale(
+                          scale: _isRunning ? _pulseAnimation.value : 1.0,
+                          child: Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              // Progress circle
+                              SizedBox(
+                                width: 250,
+                                height: 250,
+                                child: AnimatedBuilder(
+                                  animation: _progressAnimation,
+                                  builder: (context, child) {
+                                    return CircularProgressIndicator(
+                                      value: _progressAnimation.value,
+                                      strokeWidth: 8,
+                                      backgroundColor: Colors.grey.shade300,
+                                      valueColor: AlwaysStoppedAnimation<Color>(
+                                        _getPhaseColor(),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                              // Timer text
+                              Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    _formatTime(_timeRemaining),
+                                    style: TextStyle(
+                                      fontSize: 48,
+                                      fontWeight: FontWeight.bold,
+                                      color: _getPhaseColor(),
+                                      fontFeatures: [FontFeature.tabularFigures()],
+                                    ),
+                                  ),
+                                  SizedBox(height: 8),
+                                  if (_isRunning)
+                                    Container(
+                                      padding: EdgeInsets.symmetric(
+                                        horizontal: 12,
+                                        vertical: 4,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: _getPhaseColor().withOpacity(0.1),
+                                        borderRadius: BorderRadius.circular(20),
+                                      ),
+                                      child: Text(
+                                        'RUNNING',
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.bold,
+                                          color: _getPhaseColor(),
+                                          letterSpacing: 1,
+                                        ),
+                                      ),
+                                    ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ),
+
+                // Current task display
+                Container(
+                  width: double.infinity,
+                  padding: EdgeInsets.all(16),
+                  margin: EdgeInsets.only(bottom: 20),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.shade200,
+                        blurRadius: 8,
+                        offset: Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Current Task',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.grey.shade600,
+                            ),
+                          ),
+                          IconButton(
+                            icon: Icon(Icons.edit, size: 18),
+                            onPressed: () {
+                              setState(() {
+                                _showTaskInput = !_showTaskInput;
+                              });
+                            },
+                          ),
+                        ],
+                      ),
+                      if (_showTaskInput) ...[
+                        SizedBox(height: 8),
+                        TextField(
+                          controller: _taskController,
+                          decoration: InputDecoration(
+                            hintText: 'Enter your task...',
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            contentPadding: EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 8,
+                            ),
+                          ),
+                          onSubmitted: (value) {
+                            setState(() {
+                              _currentTask = value.isNotEmpty
+                                  ? value
+                                  : widget.task.title;
+                              _showTaskInput = false;
+                            });
+                          },
+                        ),
+                      ] else ...[
+                        SizedBox(height: 4),
+                        Text(
+                          _currentTask,
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.grey.shade800,
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+
+                // Control buttons
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    // Start/Pause button
+                    ElevatedButton.icon(
+                      onPressed: _isRunning ? _pauseTimer : _startTimer,
+                      icon: Icon(
+                        _isRunning ? Icons.pause : Icons.play_arrow,
+                        size: 24,
+                      ),
+                      label: Text(
+                        _isRunning ? 'Pause' : (_isPaused ? 'Resume' : 'Start'),
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: _getPhaseColor(),
+                        foregroundColor: Colors.white,
+                        padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(25),
+                        ),
+                        elevation: 4,
+                      ),
+                    ),
+
+                    // Reset button
+                    ElevatedButton.icon(
+                      onPressed: _resetTimer,
+                      icon: Icon(Icons.refresh, size: 24),
+                      label: Text(
+                        'Reset',
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.grey.shade600,
+                        foregroundColor: Colors.white,
+                        padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(25),
+                        ),
+                        elevation: 4,
+                      ),
+                    ),
                   ],
                 ),
-              ),
 
-              // Control buttons
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  // Start/Pause button
-                  ElevatedButton.icon(
-                    onPressed: _isRunning ? _pauseTimer : _startTimer,
-                    icon: Icon(
-                      _isRunning ? Icons.pause : Icons.play_arrow,
-                      size: 24,
-                    ),
-                    label: Text(
-                      _isRunning ? 'Pause' : (_isPaused ? 'Reprendre' : 'Démarrer'),
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: _getPhaseColor(),
-                      foregroundColor: Colors.white,
-                      padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(25),
-                      ),
-                      elevation: 4,
-                    ),
-                  ),
+                SizedBox(height: 20),
 
-                  // Reset button
-                  ElevatedButton.icon(
-                    onPressed: _resetTimer,
-                    icon: Icon(Icons.refresh, size: 24),
-                    label: Text(
-                      'Réinitialiser',
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.grey.shade600,
-                      foregroundColor: Colors.white,
-                      padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(25),
-                      ),
-                      elevation: 4,
-                    ),
-                  ),
-                ],
-              ),
-
-              SizedBox(height: 20),
-
-              // Statistics
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  _buildStatCard('Pomodoros', _pomodoroCount.toString(), Icons.check_circle),
-                  _buildStatCard('Phase', _currentPhase, Icons.timer),
-                ],
-              ),
-            ],
+                // Statistics
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    _buildStatCard('Pomodoros', _pomodoroCount.toString(), Icons.check_circle),
+                    _buildStatCard('Phase', _currentPhase, Icons.timer),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -1895,17 +1896,18 @@ class _PomodoroTimerState extends State<PomodoroTimer>
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Technique Pomodoro'),
+          backgroundColor: Colors.white,
+          title: Text('Pomodoro Technique'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('🍅 ${widget.task.durationMinutes} minutes de travail concentré'),
-              Text('☕ 5 minutes de pause courte'),
-              Text('🛋️ 15 minutes de pause longue (après 4 pomodoros)'),
+              Text('🍅 ${widget.task.durationMinutes} minutes of focused work'),
+              Text('☕ 5 minutes short break'),
+              Text('🛋️ 15 minutes long break (after 4 pomodoros)'),
               SizedBox(height: 16),
               Text(
-                'Répétez ce cycle pour améliorer votre productivité !',
+                'Repeat this cycle to improve your productivity!',
                 style: TextStyle(fontWeight: FontWeight.w500),
               ),
             ],
@@ -1913,7 +1915,7 @@ class _PomodoroTimerState extends State<PomodoroTimer>
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: Text('Compris'),
+              child: Text('Got it'),
             ),
           ],
         );

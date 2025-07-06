@@ -32,8 +32,8 @@ class _PomodoroTimerState extends State<PomodoroTimer>
   bool _isRunning = false;
   bool _isPaused = false;
   int _pomodoroCount = 0;
-  String _currentPhase = "Travail";
-  String _currentTask = "Concentrez-vous sur votre tâche";
+  String _currentPhase = "Work";
+  String _currentTask = "Focus on your task";
 
   late AnimationController _pulseController;
   late AnimationController _progressController;
@@ -100,17 +100,17 @@ class _PomodoroTimerState extends State<PomodoroTimer>
       );
 
       if (response.statusCode == 200) {
-        print('Statut de la tâche mis à jour: $status');
+        print('Task status updated: $status');
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Erreur serveur: ${response.statusCode}')),
+          SnackBar(content: Text('Server error: ${response.statusCode}')),
         );
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erreur: ${e.toString()}')),
+        SnackBar(content: Text('Error: ${e.toString()}')),
       );
-      print('Erreur lors de la mise à jour du statut: $e');
+      print('Error updating status: $e');
     }
   }
 
@@ -174,7 +174,7 @@ class _PomodoroTimerState extends State<PomodoroTimer>
 
     _triggerNotification();
 
-    if (_currentPhase == "Travail") {
+    if (_currentPhase == "Work") {
       await _updateTaskStatus('completed');
       if (widget.onTaskCompleted != null) {
         widget.onTaskCompleted!();
@@ -186,17 +186,17 @@ class _PomodoroTimerState extends State<PomodoroTimer>
 
   void _moveToNextPhase() {
     setState(() {
-      if (_currentPhase == "Travail") {
+      if (_currentPhase == "Work") {
         _pomodoroCount++;
         if (_pomodoroCount % 4 == 0) {
-          _currentPhase = "Pause longue";
+          _currentPhase = "Long Break";
           _timeRemaining = LONG_BREAK;
         } else {
-          _currentPhase = "Pause courte";
+          _currentPhase = "Short Break";
           _timeRemaining = SHORT_BREAK;
         }
       } else {
-        _currentPhase = "Travail";
+        _currentPhase = "Work";
         _timeRemaining = WORK_DURATION;
       }
     });
@@ -205,11 +205,11 @@ class _PomodoroTimerState extends State<PomodoroTimer>
 
   int _getCurrentPhaseDuration() {
     switch (_currentPhase) {
-      case "Travail":
+      case "Work":
         return WORK_DURATION;
-      case "Pause courte":
+      case "Short Break":
         return SHORT_BREAK;
-      case "Pause longue":
+      case "Long Break":
         return LONG_BREAK;
       default:
         return WORK_DURATION;
@@ -232,24 +232,24 @@ class _PomodoroTimerState extends State<PomodoroTimer>
           title: Row(
             children: [
               Icon(
-                _currentPhase == "Travail" ? Icons.work : Icons.coffee,
+                _currentPhase == "Work" ? Icons.work : Icons.coffee,
                 color: _getPhaseColor(),
               ),
               const SizedBox(width: 10),
-              const Text('Session terminée !'),
+              const Text('Session Completed!'),
             ],
           ),
           content: Text(
-            _currentPhase == "Travail"
-                ? 'Temps de faire une pause ! 🎉'
-                : 'C\'est reparti pour le travail ! 💪',
+            _currentPhase == "Work"
+                ? 'Time for a break! 🎉'
+                : 'Back to work! 💪',
           ),
           actions: [
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: const Text('Continuer'),
+              child: const Text('Continue'),
             ),
           ],
         );
@@ -265,11 +265,11 @@ class _PomodoroTimerState extends State<PomodoroTimer>
 
   Color _getPhaseColor() {
     switch (_currentPhase) {
-      case "Travail":
+      case "Work":
         return Colors.red;
-      case "Pause courte":
+      case "Short Break":
         return Colors.green;
-      case "Pause longue":
+      case "Long Break":
         return Colors.blue;
       default:
         return Colors.red;
@@ -287,7 +287,7 @@ class _PomodoroTimerState extends State<PomodoroTimer>
             Navigator.of(context).pop(true);
           },
         ),
-        title: const Text('Minuteur Pomodoro'),
+        title: const Text('Pomodoro Timer'),
         backgroundColor: _getPhaseColor(),
         elevation: 0,
         actions: [
@@ -302,7 +302,7 @@ class _PomodoroTimerState extends State<PomodoroTimer>
           padding: const EdgeInsets.all(20),
           child: Column(
             children: [
-              // Bouton d'abandon
+              // Abandon button
               Align(
                 alignment: Alignment.topRight,
                 child: TextButton.icon(
@@ -312,7 +312,7 @@ class _PomodoroTimerState extends State<PomodoroTimer>
                   },
                   icon: Icon(Icons.close, color: Colors.grey[600]),
                   label: Text(
-                    'Abandonner',
+                    'Abandon',
                     style: TextStyle(color: Colors.grey[600]),
                   ),
                 ),
@@ -409,7 +409,7 @@ class _PomodoroTimerState extends State<PomodoroTimer>
                                       borderRadius: BorderRadius.circular(20),
                                     ),
                                     child: Text(
-                                      'EN COURS',
+                                      'RUNNING',
                                       style: TextStyle(
                                         fontSize: 12,
                                         fontWeight: FontWeight.bold,
@@ -451,7 +451,7 @@ class _PomodoroTimerState extends State<PomodoroTimer>
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          'Tâche actuelle',
+                          'Current Task',
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w500,
@@ -479,7 +479,7 @@ class _PomodoroTimerState extends State<PomodoroTimer>
                         Icon(Icons.timer, size: 16, color: Colors.grey[600]),
                         const SizedBox(width: 8),
                         Text(
-                          'Durée: ${widget.task.durationMinutes} minutes',
+                          'Duration: ${widget.task.durationMinutes} minutes',
                           style: TextStyle(
                             fontSize: 14,
                             color: Colors.grey[600],
@@ -503,7 +503,7 @@ class _PomodoroTimerState extends State<PomodoroTimer>
                       size: 24,
                     ),
                     label: Text(
-                      _isRunning ? 'Pause' : (_isPaused ? 'Reprendre' : 'Démarrer'),
+                      _isRunning ? 'Pause' : (_isPaused ? 'Resume' : 'Start'),
                       style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                     ),
                     style: ElevatedButton.styleFrom(
@@ -522,7 +522,7 @@ class _PomodoroTimerState extends State<PomodoroTimer>
                     onPressed: _resetTimer,
                     icon: const Icon(Icons.refresh, size: 24),
                     label: const Text(
-                      'Réinitialiser',
+                      'Reset',
                       style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                     ),
                     style: ElevatedButton.styleFrom(
@@ -598,17 +598,17 @@ class _PomodoroTimerState extends State<PomodoroTimer>
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Technique Pomodoro'),
+          title: const Text('Pomodoro Technique'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('🍅 ${widget.task.durationMinutes} minutes de travail concentré'),
-              const Text('☕ 5 minutes de pause courte'),
-              const Text('🛋️ 15 minutes de pause longue (après 4 pomodoros)'),
+              Text('🍅 ${widget.task.durationMinutes} minutes of focused work'),
+              const Text('☕ 5 minutes short break'),
+              const Text('🛋️ 15 minutes long break (after 4 pomodoros)'),
               const SizedBox(height: 16),
               const Text(
-                'Répétez ce cycle pour améliorer votre productivité !',
+                'Repeat this cycle to improve your productivity!',
                 style: TextStyle(fontWeight: FontWeight.w500),
               ),
             ],
@@ -616,7 +616,7 @@ class _PomodoroTimerState extends State<PomodoroTimer>
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Compris'),
+              child: const Text('Got it'),
             ),
           ],
         );

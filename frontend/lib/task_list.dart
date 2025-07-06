@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
-//import 'package:student_study_planner/task_list.dart';
 
 void main() {
   runApp(TaskList());
@@ -102,22 +101,22 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
     tasks = [
       Task(
         id: '1',
-        title: 'Révision Mathématiques',
-        subject: 'Mathématiques',
+        title: 'Math Revision',
+        subject: 'Mathematics',
         dueDate: now.add(Duration(minutes: 15)),
         priority: 'High',
       ),
       Task(
         id: '2',
-        title: 'Devoir Physique',
-        subject: 'Physique',
+        title: 'Physics Homework',
+        subject: 'Physics',
         dueDate: now.add(Duration(hours: 2)),
         priority: 'Medium',
       ),
       Task(
         id: '3',
-        title: 'Lecture Histoire',
-        subject: 'Histoire',
+        title: 'History Reading',
+        subject: 'History',
         dueDate: now.subtract(Duration(days: 1)),
         isCompleted: true,
         completedDate: now.subtract(Duration(days: 1)),
@@ -125,8 +124,8 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
       ),
       Task(
         id: '4',
-        title: 'Exercices Anglais',
-        subject: 'Anglais',
+        title: 'English Exercises',
+        subject: 'English',
         dueDate: now.subtract(Duration(days: 3)),
         isCompleted: true,
         completedDate: now.subtract(Duration(days: 2)),
@@ -148,7 +147,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
         notifications.add(
           NotificationItem(
             id: 'notif_${task.id}',
-            message: '🕘 ${task.title} dans ${timeDiff.inMinutes} minutes',
+            message: '🕘 ${task.title} in ${timeDiff.inMinutes} minutes',
             scheduledTime: task.dueDate.subtract(Duration(minutes: 15)),
             taskId: task.id,
             isActive: notificationsEnabled,
@@ -200,14 +199,8 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
           unselectedLabelColor: Colors.grey,
           indicatorColor: Colors.blue,
           tabs: [
-            Tab(
-              icon: Icon(Icons.notifications),
-              text: 'Notifications',
-            ),
-            Tab(
-              icon: Icon(Icons.task_alt),
-              text: 'Tâches Terminées',
-            ),
+            Tab(icon: Icon(Icons.notifications), text: 'Notifications'),
+            Tab(icon: Icon(Icons.task_alt), text: 'Completed Tasks'),
           ],
         ),
       ),
@@ -269,7 +262,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
 
           // Upcoming Reminders Section
           Text(
-            'Rappels à venir',
+            'Upcoming Reminders',
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
@@ -290,7 +283,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                     Icon(Icons.schedule, size: 48, color: Colors.grey[300]),
                     SizedBox(height: 12),
                     Text(
-                      'Aucun rappel à venir',
+                      'No upcoming reminders',
                       style: TextStyle(
                         fontSize: 16,
                         color: Colors.grey[600],
@@ -307,7 +300,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
 
           // Upcoming Tasks
           Text(
-            'Tâches à venir',
+            'Upcoming Tasks',
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
@@ -344,7 +337,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
             children: [
               Expanded(
                 child: _buildStatCard(
-                  'Taux de complétion',
+                  'Completion Rate',
                   '${(completionRate * 100).toInt()}%',
                   Icons.trending_up,
                   Colors.green,
@@ -353,8 +346,8 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
               SizedBox(width: 12),
               Expanded(
                 child: _buildStatCard(
-                  'Cette semaine',
-                  '$thisWeekTasks tâches',
+                  'This Week',
+                  '$thisWeekTasks tasks',
                   Icons.calendar_today,
                   Colors.blue,
                 ),
@@ -368,8 +361,8 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
             children: [
               Expanded(
                 child: _buildStatCard(
-                  'Ce mois',
-                  '$thisMonthTasks tâches',
+                  'This Month',
+                  '$thisMonthTasks tasks',
                   Icons.calendar_month,
                   Colors.purple,
                 ),
@@ -377,8 +370,8 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
               SizedBox(width: 12),
               Expanded(
                 child: _buildStatCard(
-                  'Total terminé',
-                  '${completedTasks.length} tâches',
+                  'Total Completed',
+                  '${completedTasks.length} tasks',
                   Icons.task_alt,
                   Colors.orange,
                 ),
@@ -392,7 +385,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
           Row(
             children: [
               Text(
-                'Historique des tâches',
+                'Task History',
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
@@ -406,9 +399,9 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                   // Implement filtering logic here
                 },
                 itemBuilder: (context) => [
-                  PopupMenuItem(value: 'week', child: Text('Cette semaine')),
-                  PopupMenuItem(value: 'month', child: Text('Ce mois')),
-                  PopupMenuItem(value: 'all', child: Text('Toutes')),
+                  PopupMenuItem(value: 'week', child: Text('This Week')),
+                  PopupMenuItem(value: 'month', child: Text('This Month')),
+                  PopupMenuItem(value: 'all', child: Text('All')),
                 ],
               ),
             ],
@@ -428,7 +421,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                     Icon(Icons.task_alt, size: 48, color: Colors.grey[300]),
                     SizedBox(height: 12),
                     Text(
-                      'Aucune tâche terminée',
+                      'No completed tasks',
                       style: TextStyle(
                         fontSize: 16,
                         color: Colors.grey[600],
@@ -467,7 +460,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
           style: TextStyle(fontWeight: FontWeight.w600),
         ),
         subtitle: Text(
-          'Matière: ${task.subject}',
+          'Subject: ${task.subject}',
           style: TextStyle(color: Colors.grey[600]),
         ),
         trailing: notificationsEnabled
@@ -502,15 +495,15 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('${task.subject} • ${_getPriorityText(task.priority)}'),
+            Text(task.subject),
             if (task.isCompleted && task.completedDate != null)
               Text(
-                'Terminé le ${_formatDate(task.completedDate!)}',
+                'Completed on ${_formatDate(task.completedDate!)}',
                 style: TextStyle(color: Colors.green, fontSize: 12),
               )
             else
               Text(
-                'Échéance: ${_formatDate(task.dueDate)}',
+                'Due: ${_formatDate(task.dueDate)}',
                 style: TextStyle(
                   color: isOverdue ? Colors.red : Colors.grey[600],
                   fontSize: 12,
@@ -577,15 +570,6 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
     );
   }
 
-  String _getPriorityText(String priority) {
-    switch (priority) {
-      case 'High': return 'Haute priorité';
-      case 'Medium': return 'Priorité moyenne';
-      case 'Low': return 'Faible priorité';
-      default: return priority;
-    }
-  }
-
   Color _getPriorityColor(String priority) {
     switch (priority) {
       case 'High': return Colors.red;
@@ -600,15 +584,15 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
     final difference = now.difference(date);
 
     if (difference.inDays == 0) {
-      return 'Aujourd\'hui ${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}';
+      return 'Today ${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}';
     } else if (difference.inDays == 1) {
-      return 'Hier';
+      return 'Yesterday';
     } else if (difference.inDays == -1) {
-      return 'Demain';
+      return 'Tomorrow';
     } else if (difference.inDays > 0) {
-      return 'Il y a ${difference.inDays} jours';
+      return '${difference.inDays} days ago';
     } else {
-      return 'Dans ${(-difference.inDays)} jours';
+      return 'In ${(-difference.inDays)} days';
     }
   }
 

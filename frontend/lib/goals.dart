@@ -56,11 +56,11 @@ class StudyGoal {
   String get statusText {
     final now = DateTime.now();
     if (now.isBefore(startDate)) {
-      return 'À venir';
+      return 'Upcoming';
     } else if (now.isAfter(endDate)) {
-      return 'Terminé';
+      return 'Completed';
     } else {
-      return 'En cours';
+      return 'Active';
     }
   }
 
@@ -100,7 +100,7 @@ class AuthService {
       final data = json.decode(response.body);
       return data['token'];
     } else {
-      throw Exception('Échec de la connexion: ${response.statusCode}');
+      throw Exception('Login failed: ${response.statusCode}');
     }
   }
 
@@ -112,7 +112,7 @@ class AuthService {
     );
 
     if (response.statusCode != 201) {
-      throw Exception('Échec de l\'inscription: ${response.statusCode}');
+      throw Exception('Registration failed: ${response.statusCode}');
     }
   }
 
@@ -152,13 +152,13 @@ class ApiService {
         List<dynamic> body = json.decode(response.body);
         return body.map((dynamic item) => StudyGoal.fromJson(item)).toList();
       } else if (response.statusCode == 401) {
-        throw Exception('Authentification requise');
+        throw Exception('Authentication required');
       } else {
-        throw Exception('Échec du chargement: ${response.statusCode}');
+        throw Exception('Failed to load: ${response.statusCode}');
       }
     } catch (e) {
-      log('Erreur réseau: $e');
-      throw Exception('Impossible de se connecter au serveur');
+      log('Network error: $e');
+      throw Exception('Unable to connect to server');
     }
   }
 
@@ -174,13 +174,13 @@ class ApiService {
       if (response.statusCode == 201) {
         return StudyGoal.fromJson(json.decode(response.body));
       } else if (response.statusCode == 401) {
-        throw Exception('Authentification requise');
+        throw Exception('Authentication required');
       } else {
-        throw Exception('Échec de création: ${response.statusCode}');
+        throw Exception('Creation failed: ${response.statusCode}');
       }
     } catch (e) {
-      log('Erreur création: $e');
-      throw Exception('Erreur de création: $e');
+      log('Creation error: $e');
+      throw Exception('Creation error: $e');
     }
   }
 
@@ -196,13 +196,13 @@ class ApiService {
       if (response.statusCode == 200) {
         return StudyGoal.fromJson(json.decode(response.body));
       } else if (response.statusCode == 401) {
-        throw Exception('Authentification requise');
+        throw Exception('Authentication required');
       } else {
-        throw Exception('Échec de mise à jour: ${response.statusCode}');
+        throw Exception('Update failed: ${response.statusCode}');
       }
     } catch (e) {
-      log('Erreur mise à jour: $e');
-      throw Exception('Erreur de mise à jour: $e');
+      log('Update error: $e');
+      throw Exception('Update error: $e');
     }
   }
 
@@ -217,13 +217,13 @@ class ApiService {
       if (response.statusCode == 200) {
         return;
       } else if (response.statusCode == 401) {
-        throw Exception('Authentification requise');
+        throw Exception('Authentication required');
       } else {
-        throw Exception('Échec de suppression: ${response.statusCode}');
+        throw Exception('Deletion failed: ${response.statusCode}');
       }
     } catch (e) {
-      log('Erreur suppression: $e');
-      throw Exception('Erreur de suppression: $e');
+      log('Deletion error: $e');
+      throw Exception('Deletion error: $e');
     }
   }
 }
@@ -259,98 +259,98 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                  const Icon(
-                  Icons.school,
-                  size: 64,
-                  color: Color(0xFF2E7D32),
-                ),
-                const SizedBox(height: 24),
-                const Text(
-                  'Connexion',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 32),
-                TextFormField(
-                  controller: _emailController,
-                  keyboardType: TextInputType.emailAddress,
-                  decoration: InputDecoration(
-                    labelText: 'Email',
-                    prefixIcon: const Icon(Icons.email),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
+                    const Icon(
+                      Icons.school,
+                      size: 64,
+                      color: Color(0xFF2E7D32),
                     ),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Veuillez entrer votre email';
-                    }
-                    if (!value.contains('@')) {
-                      return 'Email invalide';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 16),
-                TextFormField(
-                  controller: _passwordController,
-                  obscureText: true,
-                  decoration: InputDecoration(
-                    labelText: 'Mot de passe',
-                    prefixIcon: const Icon(Icons.lock),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Veuillez entrer votre mot de passe';
-                    }
-                    if (value.length < 6) {
-                      return 'Le mot de passe doit contenir au moins 6 caractères';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 24),
-                SizedBox(
-                  width: double.infinity,
-                  height: 50,
-                  child: ElevatedButton(
-                    onPressed: _isLoading ? null : _login,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF2E7D32),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    child: _isLoading
-                        ? const CircularProgressIndicator(color: Colors.white)
-                        : const Text(
-                      'Se connecter',
+                    const SizedBox(height: 24),
+                    const Text(
+                      'Login',
                       style: TextStyle(
-                        fontSize: 16,
+                        fontSize: 24,
                         fontWeight: FontWeight.bold,
-                        color: Colors.white,
                       ),
                     ),
-                  ),
-                ),
-                const SizedBox(height: 16),
-                TextButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => RegisterScreen()),
-                    );
-                  },
-                  child: const Text(
-                    'Créer un compte',
-                    style: TextStyle(color: Color(0xFF2E7D32)),
-                  ),
-                )],
+                    const SizedBox(height: 32),
+                    TextFormField(
+                      controller: _emailController,
+                      keyboardType: TextInputType.emailAddress,
+                      decoration: InputDecoration(
+                        labelText: 'Email',
+                        prefixIcon: const Icon(Icons.email),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter your email';
+                        }
+                        if (!value.contains('@')) {
+                          return 'Invalid email';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 16),
+                    TextFormField(
+                      controller: _passwordController,
+                      obscureText: true,
+                      decoration: InputDecoration(
+                        labelText: 'Password',
+                        prefixIcon: const Icon(Icons.lock),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter your password';
+                        }
+                        if (value.length < 6) {
+                          return 'Password must be at least 6 characters';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 24),
+                    SizedBox(
+                      width: double.infinity,
+                      height: 50,
+                      child: ElevatedButton(
+                        onPressed: _isLoading ? null : _login,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF2E7D32),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: _isLoading
+                            ? const CircularProgressIndicator(color: Colors.white)
+                            : const Text(
+                          'Login',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    TextButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => RegisterScreen()),
+                        );
+                      },
+                      child: const Text(
+                        'Create an account',
+                        style: TextStyle(color: Color(0xFF2E7D32)),
+                      ),
+                    )],
                 ),
               ),
             ),
@@ -380,7 +380,7 @@ class _LoginScreenState extends State<LoginScreen> {
         setState(() => _isLoading = false);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Erreur de connexion: ${e.toString()}'),
+            content: Text('Login error: ${e.toString()}'),
             backgroundColor: Colors.red,
           ),
         );
@@ -421,113 +421,113 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                  const Icon(
-                  Icons.school,
-                  size: 64,
-                  color: Color(0xFF2E7D32),
-                ),
-                const SizedBox(height: 24),
-                const Text(
-                  'Créer un compte',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 32),
-                TextFormField(
-                  controller: _emailController,
-                  keyboardType: TextInputType.emailAddress,
-                  decoration: InputDecoration(
-                    labelText: 'Email',
-                    prefixIcon: const Icon(Icons.email),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
+                    const Icon(
+                      Icons.school,
+                      size: 64,
+                      color: Color(0xFF2E7D32),
                     ),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Veuillez entrer votre email';
-                    }
-                    if (!value.contains('@')) {
-                      return 'Email invalide';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 16),
-                TextFormField(
-                  controller: _passwordController,
-                  obscureText: true,
-                  decoration: InputDecoration(
-                    labelText: 'Mot de passe',
-                    prefixIcon: const Icon(Icons.lock),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Veuillez entrer votre mot de passe';
-                    }
-                    if (value.length < 6) {
-                      return 'Le mot de passe doit contenir au moins 6 caractères';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 16),
-                TextFormField(
-                  controller: _confirmPasswordController,
-                  obscureText: true,
-                  decoration: InputDecoration(
-                    labelText: 'Confirmer le mot de passe',
-                    prefixIcon: const Icon(Icons.lock),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  validator: (value) {
-                    if (value != _passwordController.text) {
-                      return 'Les mots de passe ne correspondent pas';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 24),
-                SizedBox(
-                  width: double.infinity,
-                  height: 50,
-                  child: ElevatedButton(
-                    onPressed: _isLoading ? null : _register,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF2E7D32),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    child: _isLoading
-                        ? const CircularProgressIndicator(color: Colors.white)
-                        : const Text(
-                      'S\'inscrire',
+                    const SizedBox(height: 24),
+                    const Text(
+                      'Create Account',
                       style: TextStyle(
-                        fontSize: 16,
+                        fontSize: 24,
                         fontWeight: FontWeight.bold,
-                        color: Colors.white,
                       ),
                     ),
-                  ),
-                ),
-                const SizedBox(height: 16),
-                TextButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  child: const Text(
-                    'Retour à la connexion',
-                    style: TextStyle(color: Color(0xFF2E7D32)),
-                  ),
-                )],
+                    const SizedBox(height: 32),
+                    TextFormField(
+                      controller: _emailController,
+                      keyboardType: TextInputType.emailAddress,
+                      decoration: InputDecoration(
+                        labelText: 'Email',
+                        prefixIcon: const Icon(Icons.email),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter your email';
+                        }
+                        if (!value.contains('@')) {
+                          return 'Invalid email';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 16),
+                    TextFormField(
+                      controller: _passwordController,
+                      obscureText: true,
+                      decoration: InputDecoration(
+                        labelText: 'Password',
+                        prefixIcon: const Icon(Icons.lock),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter your password';
+                        }
+                        if (value.length < 6) {
+                          return 'Password must be at least 6 characters';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 16),
+                    TextFormField(
+                      controller: _confirmPasswordController,
+                      obscureText: true,
+                      decoration: InputDecoration(
+                        labelText: 'Confirm Password',
+                        prefixIcon: const Icon(Icons.lock),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      validator: (value) {
+                        if (value != _passwordController.text) {
+                          return 'Passwords do not match';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 24),
+                    SizedBox(
+                      width: double.infinity,
+                      height: 50,
+                      child: ElevatedButton(
+                        onPressed: _isLoading ? null : _register,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF2E7D32),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: _isLoading
+                            ? const CircularProgressIndicator(color: Colors.white)
+                            : const Text(
+                          'Register',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: const Text(
+                        'Back to login',
+                        style: TextStyle(color: Color(0xFF2E7D32)),
+                      ),
+                    )],
                 ),
               ),
             ),
@@ -549,7 +549,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Compte créé avec succès! Veuillez vous connecter'),
+            content: Text('Account created successfully! Please login'),
             backgroundColor: Colors.green,
           ),
         );
@@ -559,7 +559,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         setState(() => _isLoading = false);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Erreur d\'inscription: ${e.toString()}'),
+            content: Text('Registration error: ${e.toString()}'),
             backgroundColor: Colors.red,
           ),
         );
@@ -609,8 +609,8 @@ class _StudyGoalsScreenState extends State<StudyGoalsScreen> {
       });
     } catch (e) {
       setState(() => _isLoading = false);
-      _showErrorSnackbar('Erreur de chargement: ${e.toString()}');
-      log('Erreur détaillée: $e');
+      _showErrorSnackbar('Loading error: ${e.toString()}');
+      log('Detailed error: $e');
     }
   }
 
@@ -624,7 +624,7 @@ class _StudyGoalsScreenState extends State<StudyGoalsScreen> {
       backgroundColor: const Color(0xFFF5F5F5),
       appBar: AppBar(
         title: const Text(
-          'Objectifs d\'étude',
+          'Study Goals',
           style: TextStyle(
             fontWeight: FontWeight.bold,
             color: Colors.white,
@@ -636,12 +636,12 @@ class _StudyGoalsScreenState extends State<StudyGoalsScreen> {
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: _loadGoals,
-            tooltip: 'Rafraîchir',
+            tooltip: 'Refresh',
           ),
           IconButton(
             icon: const Icon(Icons.logout),
             onPressed: _logout,
-            tooltip: 'Déconnexion',
+            tooltip: 'Logout',
           ),
         ],
       ),
@@ -693,7 +693,7 @@ class _StudyGoalsScreenState extends State<StudyGoalsScreen> {
                   ),
                   const SizedBox(width: 8),
                   Text(
-                    'Créer un nouvel objectif',
+                    'Create New Goal',
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
@@ -708,7 +708,7 @@ class _StudyGoalsScreenState extends State<StudyGoalsScreen> {
                 keyboardType: TextInputType.number,
                 inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                 decoration: InputDecoration(
-                  labelText: 'Heures par semaine',
+                  labelText: 'Hours per week',
                   hintText: 'Ex: 10',
                   prefixIcon: const Icon(Icons.schedule),
                   suffixText: 'h',
@@ -725,28 +725,28 @@ class _StudyGoalsScreenState extends State<StudyGoalsScreen> {
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Veuillez entrer le nombre d\'heures';
+                    return 'Please enter hours';
                   }
                   final hours = int.tryParse(value);
                   if (hours == null || hours <= 0) {
-                    return 'Veuillez entrer un nombre valide';
+                    return 'Please enter a valid number';
                   }
                   if (hours > 168) {
-                    return 'Maximum 168 heures par semaine';
+                    return 'Maximum 168 hours per week';
                   }
                   return null;
                 },
               ),
               const SizedBox(height: 16),
               _buildDatePicker(
-                label: 'Date de début',
+                label: 'Start Date',
                 icon: Icons.calendar_today,
                 date: _startDate,
                 onTap: () => _selectDate(context, isStartDate: true),
               ),
               const SizedBox(height: 16),
               _buildDatePicker(
-                label: 'Date de fin',
+                label: 'End Date',
                 icon: Icons.event,
                 date: _endDate,
                 onTap: () => _selectDate(context, isStartDate: false),
@@ -766,7 +766,7 @@ class _StudyGoalsScreenState extends State<StudyGoalsScreen> {
                   child: _isSubmitting
                       ? const CircularProgressIndicator(color: Colors.white)
                       : const Text(
-                    'Créer l\'objectif',
+                    'Create Goal',
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
@@ -803,7 +803,7 @@ class _StudyGoalsScreenState extends State<StudyGoalsScreen> {
             Expanded(
               child: Text(
                 date == null
-                    ? 'Sélectionner la $label'
+                    ? 'Select $label'
                     : '$label: ${_formatDate(date)}',
                 style: TextStyle(
                   fontSize: 16,
@@ -826,7 +826,7 @@ class _StudyGoalsScreenState extends State<StudyGoalsScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Mes objectifs',
+          'My Goals',
           style: TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.bold,
@@ -835,15 +835,15 @@ class _StudyGoalsScreenState extends State<StudyGoalsScreen> {
         ),
         const SizedBox(height: 16),
         if (activeGoals.isNotEmpty) ...[
-          _buildGoalSection('Objectifs actifs', activeGoals, Colors.green),
+          _buildGoalSection('Active Goals', activeGoals, Colors.green),
           const SizedBox(height: 16),
         ],
         if (upcomingGoals.isNotEmpty) ...[
-          _buildGoalSection('À venir', upcomingGoals, Colors.orange),
+          _buildGoalSection('Upcoming Goals', upcomingGoals, Colors.orange),
           const SizedBox(height: 16),
         ],
         if (completedGoals.isNotEmpty) ...[
-          _buildGoalSection('Terminés', completedGoals, Colors.grey),
+          _buildGoalSection('Completed Goals', completedGoals, Colors.grey),
         ],
         if (_goals.isEmpty)
           _buildEmptyState(),
@@ -887,7 +887,7 @@ class _StudyGoalsScreenState extends State<StudyGoalsScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  '${goal.targetHours}h / semaine',
+                  '${goal.targetHours}h / week',
                   style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -926,7 +926,7 @@ class _StudyGoalsScreenState extends State<StudyGoalsScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'Progression',
+                      'Progress',
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w500,
@@ -956,7 +956,7 @@ class _StudyGoalsScreenState extends State<StudyGoalsScreen> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  '${(goal.progressPercentage * 100).toStringAsFixed(0)}% complété',
+                  '${(goal.progressPercentage * 100).toStringAsFixed(0)}% completed',
                   style: TextStyle(
                     fontSize: 12,
                     color: Colors.grey[600],
@@ -972,7 +972,7 @@ class _StudyGoalsScreenState extends State<StudyGoalsScreen> {
                     child: OutlinedButton.icon(
                       onPressed: () => _addHours(goal),
                       icon: const Icon(Icons.add, size: 16),
-                      label: const Text('Ajouter heures'),
+                      label: const Text('Add Hours'),
                       style: OutlinedButton.styleFrom(
                         foregroundColor: const Color(0xFF2E7D32),
                         side: const BorderSide(color: Color(0xFF2E7D32)),
@@ -1005,7 +1005,7 @@ class _StudyGoalsScreenState extends State<StudyGoalsScreen> {
           ),
           const SizedBox(height: 16),
           Text(
-            'Aucun objectif défini',
+            'No goals set',
             style: TextStyle(
               fontSize: 18,
               color: Colors.grey[600],
@@ -1013,7 +1013,7 @@ class _StudyGoalsScreenState extends State<StudyGoalsScreen> {
           ),
           const SizedBox(height: 8),
           Text(
-            'Créez votre premier objectif d\'étude',
+            'Create your first study goal',
             style: TextStyle(
               fontSize: 14,
               color: Colors.grey[500],
@@ -1026,11 +1026,11 @@ class _StudyGoalsScreenState extends State<StudyGoalsScreen> {
 
   Color _getStatusColor(String status) {
     switch (status) {
-      case 'En cours':
+      case 'Active':
         return Colors.green;
-      case 'À venir':
+      case 'Upcoming':
         return Colors.orange;
-      case 'Terminé':
+      case 'Completed':
         return Colors.grey;
       default:
         return Colors.grey;
@@ -1059,14 +1059,14 @@ class _StudyGoalsScreenState extends State<StudyGoalsScreen> {
       );
       if (picked != null) {
         setState(() => _startDate = picked);
-        // Réinitialiser la date de fin si elle est antérieure
+        // Reset end date if it's before start date
         if (_endDate != null && _endDate!.isBefore(picked)) {
           setState(() => _endDate = null);
         }
       }
     } else {
       if (_startDate == null) {
-        _showErrorSnackbar('Sélectionnez d\'abord la date de début');
+        _showErrorSnackbar('Please select start date first');
         return;
       }
       picked = await showDatePicker(
@@ -1084,7 +1084,7 @@ class _StudyGoalsScreenState extends State<StudyGoalsScreen> {
   Future<void> _createGoal() async {
     if (!_formKey.currentState!.validate()) return;
     if (_startDate == null || _endDate == null) {
-      _showErrorSnackbar('Veuillez sélectionner les dates');
+      _showErrorSnackbar('Please select dates');
       return;
     }
 
@@ -1108,9 +1108,9 @@ class _StudyGoalsScreenState extends State<StudyGoalsScreen> {
         _endDate = null;
       });
 
-      _showSuccessSnackbar('Objectif créé avec succès!');
+      _showSuccessSnackbar('Goal created successfully!');
     } catch (e) {
-      _showErrorSnackbar('Erreur de création: ${e.toString()}');
+      _showErrorSnackbar('Creation error: ${e.toString()}');
     } finally {
       setState(() => _isSubmitting = false);
     }
@@ -1121,25 +1121,25 @@ class _StudyGoalsScreenState extends State<StudyGoalsScreen> {
     await showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Ajouter des heures'),
+        title: const Text('Add Hours'),
         content: TextField(
           controller: controller,
           keyboardType: TextInputType.numberWithOptions(decimal: true),
           decoration: const InputDecoration(
-            labelText: 'Heures à ajouter',
+            labelText: 'Hours to add',
             suffixText: 'h',
           ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Annuler'),
+            child: const Text('Cancel'),
           ),
           ElevatedButton(
             onPressed: () async {
               final hours = double.tryParse(controller.text);
               if (hours == null || hours <= 0) {
-                _showErrorSnackbar('Veuillez entrer un nombre valide');
+                _showErrorSnackbar('Please enter a valid number');
                 return;
               }
 
@@ -1155,13 +1155,13 @@ class _StudyGoalsScreenState extends State<StudyGoalsScreen> {
 
                 await _apiService.updateGoal(updatedGoal);
                 setState(() => goal.completedHours += hours);
-                _showSuccessSnackbar('${hours}h ajoutées avec succès!');
+                _showSuccessSnackbar('${hours}h added successfully!');
                 Navigator.pop(context);
               } catch (e) {
-                _showErrorSnackbar('Erreur: ${e.toString()}');
+                _showErrorSnackbar('Error: ${e.toString()}');
               }
             },
-            child: const Text('Ajouter'),
+            child: const Text('Add'),
           ),
         ],
       ),
@@ -1172,12 +1172,12 @@ class _StudyGoalsScreenState extends State<StudyGoalsScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Supprimer l\'objectif'),
-        content: const Text('Êtes-vous sûr de vouloir supprimer cet objectif?'),
+        title: const Text('Delete Goal'),
+        content: const Text('Are you sure you want to delete this goal?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Annuler'),
+            child: const Text('Cancel'),
           ),
           ElevatedButton(
             onPressed: () async {
@@ -1185,13 +1185,13 @@ class _StudyGoalsScreenState extends State<StudyGoalsScreen> {
               try {
                 await _apiService.deleteGoal(goalId);
                 setState(() => _goals.removeWhere((goal) => goal.id == goalId));
-                _showSuccessSnackbar('Objectif supprimé');
+                _showSuccessSnackbar('Goal deleted');
               } catch (e) {
-                _showErrorSnackbar('Erreur de suppression: ${e.toString()}');
+                _showErrorSnackbar('Deletion error: ${e.toString()}');
               }
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            child: const Text('Supprimer'),
+            child: const Text('Delete'),
           ),
         ],
       ),
@@ -1199,7 +1199,7 @@ class _StudyGoalsScreenState extends State<StudyGoalsScreen> {
   }
 
   String _formatDate(DateTime date) {
-    return DateFormat('dd/MM/yyyy').format(date);
+    return DateFormat('MM/dd/yyyy').format(date);
   }
 
   void _showSuccessSnackbar(String message) {
